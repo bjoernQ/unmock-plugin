@@ -10,19 +10,19 @@ It tries to solve the problem that you have to mock each and every Android SDK c
 
 Add this to your buildscript dependencies:
 
-```
+```groovy
 classpath 'de.mobilej.unmock:UnMockPlugin:0.1.0'
 ```
 
 And this to the module's build script:
 
-```
+```groovy
 apply plugin: 'de.mobilej.unmock'
 ```
 
 Additionally you have to configure which classes to use and where to get the real Android.jar from. e.g:
 
-```
+```groovy
 unMock {
     // URI to download the android-all.jar from. e.g. https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/
     allAndroid =
