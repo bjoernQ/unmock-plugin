@@ -22,6 +22,7 @@ import org.xmlpull.v1.XmlPullParser;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spannable;
@@ -38,6 +39,7 @@ import java.io.StringWriter;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.powermock.api.mockito.PowerMockito.mock;
 
 /**
  * Some simple tests which prove that the "unmocked" Android classes are actually working.
@@ -105,6 +107,12 @@ public class SimpleTest {
         loc2.setLatitude(9);
 
         assertEquals(110598.56, loc.distanceTo(loc2), 0.5);
+    }
+
+    @Test
+    public void testLocationManagerIsNotTaken() {
+        // will raise an error on a copied LocationManager
+        mock(LocationManager.class);
     }
 
     @Test

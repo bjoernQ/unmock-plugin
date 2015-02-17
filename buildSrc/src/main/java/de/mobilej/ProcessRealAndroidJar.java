@@ -105,9 +105,22 @@ public class ProcessRealAndroidJar {
 
             boolean keep = false;
             for (String keepClass : keepClasses) {
-                if (clazz.getName().startsWith(keepClass)) {
-                    keep = true;
-                    break;
+                if (keepClass.startsWith("-")) {
+                    String pureKeepClassName = keepClass.substring(1);
+                    if (clazz.getName().equals(pureKeepClassName)) {
+                        keep = true;
+                        break;
+                    } else if (clazz.getName().startsWith(pureKeepClassName + "$")) {
+                        keep = true;
+                        break;
+                    }
+
+
+                } else {
+                    if (clazz.getName().startsWith(keepClass)) {
+                        keep = true;
+                        break;
+                    }
                 }
             }
 

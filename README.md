@@ -30,13 +30,15 @@ unMock {
 
     // classes to keep
     // matched by "startsWith" - you also need to include the dependencies manually
+    // if you start with an "-" the class will match by "equals" (and it will additionally  match
+    // inner classes of this class)
     keep = [
             "android.text.TextUtils",
             "android.util.",
             "android.text.",
             "android.content.ContentValues",
             "android.content.Intent",
-            "android.location.Location",
+            "-android.location.Location",
             "android.content.res.Configuration",
             "org.",
             "libcore.",
@@ -55,6 +57,7 @@ Have a look at the example contained in this repository.
 |Version|Description|
 |-------|-----------|
 |0.1.0|initial public release|
+|0.1.1|added the '-' matching|
 
 
 ## License
