@@ -11,7 +11,7 @@ It tries to solve the problem that you have to mock each and every Android SDK c
 Add this to your buildscript dependencies:
 
 ```groovy
-classpath 'de.mobilej.unmock:UnMockPlugin:0.1.0'
+classpath 'de.mobilej.unmock:UnMockPlugin:0.1.1'
 ```
 
 And this to the module's build script:
