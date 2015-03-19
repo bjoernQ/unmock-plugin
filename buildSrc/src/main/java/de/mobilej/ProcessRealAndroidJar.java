@@ -168,7 +168,7 @@ public class ProcessRealAndroidJar {
         BufferedInputStream origin;
         FileInputStream fi = new FileInputStream(f);
         origin = new BufferedInputStream(fi, BUFFER);
-        String name = f.getCanonicalPath().substring(root.getCanonicalPath().length() + 1);
+        String name = f.getCanonicalPath().substring(root.getCanonicalPath().length() + 1).replace('\\','/');
         JarEntry entry = new JarEntry(name);
         out.putNextEntry(entry);
         int count;
