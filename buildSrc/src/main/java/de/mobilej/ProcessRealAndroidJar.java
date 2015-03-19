@@ -27,6 +27,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -48,20 +50,6 @@ import javassist.Modifier;
  * for easier mocking.
  */
 public class ProcessRealAndroidJar {
-
-    public static boolean createZipArchive(String outfile, String srcFolder) throws Exception {
-
-        FileOutputStream dest = new FileOutputStream(new File(outfile));
-
-        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
-
-        addToZip(out, new File(srcFolder), new File(srcFolder));
-
-        out.flush();
-        out.close();
-
-        return true;
-    }
 
     public static void process(String allAndroidSourceUrl, String[] keepClasses, String destFile,
             String intermediatesDir)
@@ -137,12 +125,26 @@ public class ProcessRealAndroidJar {
             clazz.writeFile(out.getAbsolutePath());
         }
 
-        createZipArchive(destFile,
+        createJarArchive(destFile,
                 out.getAbsolutePath());
 
     }
 
-    private static void addToZip(ZipOutputStream out, File folder, File root) throws Exception {
+    public static boolean createJarArchive(String outfile, String srcFolder) throws Exception {
+
+        FileOutputStream dest = new FileOutputStream(new File(outfile));
+
+        JarOutputStream out = new JarOutputStream(new BufferedOutputStream(dest));
+
+        addToJar(out, new File(srcFolder), new File(srcFolder));
+
+        out.flush();
+        out.close();
+
+        return true;
+    }
+
+    private static void addToJar(JarOutputStream out, File folder, File root) throws Exception {
         File[] files = folder.listFiles();
 
         if (files == null) {
@@ -151,14 +153,14 @@ public class ProcessRealAndroidJar {
 
         for (File f : files) {
             if (f.isDirectory()) {
-                addToZip(out, f, root);
+                addToJar(out, f, root);
             } else {
-                addZipEntry(out, f, root);
+                addJarEntry(out, f, root);
             }
         }
     }
 
-    private static BufferedInputStream addZipEntry(ZipOutputStream out, File f, File root)
+    private static BufferedInputStream addJarEntry(ZipOutputStream out, File f, File root)
             throws IOException {
         int BUFFER = 2048;
         byte data[] = new byte[BUFFER];
@@ -166,8 +168,8 @@ public class ProcessRealAndroidJar {
         BufferedInputStream origin;
         FileInputStream fi = new FileInputStream(f);
         origin = new BufferedInputStream(fi, BUFFER);
-        String name = f.getCanonicalPath().substring(root.getCanonicalPath().length() + 1);
-        ZipEntry entry = new ZipEntry(name);
+        String name = f.getCanonicalPath().substring(root.getCanonicalPath().length() + 1).replace('\\','/');
+        JarEntry entry = new JarEntry(name);
         out.putNextEntry(entry);
         int count;
         while ((count = origin.read(data, 0, BUFFER)) != -1) {
