@@ -68,7 +68,11 @@ Have a look at the example contained in this repository.
 |-------|-----------|
 |0.1.0|initial public release|
 |0.1.1|added the '-' matching|
+|0.1.2|fixed a bug preventing the plugin to work correctly on Windows systems|
 
+## Known Issues
+
+When changing the classes to be included from the real Android jar you'll need a "gradle clean".
 
 ## License
 
