@@ -18,7 +18,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-def pluginVersion = '0.1.2'
+def pluginVersion = '0.1.3'
 
 buildscript {
     repositories {
@@ -34,6 +34,15 @@ allprojects {
     repositories {
         jcenter()
     }
+}
+
+
+tasks.withType(JavaCompile) {
+
+    sourceCompatibility = '1.7'
+
+    targetCompatibility = '1.7'
+
 }
 
 task sourceJar(type: Jar) {
@@ -82,7 +91,7 @@ bintray {
 
         version {
             name = pluginVersion //Bintray logical version name
-            desc = 'fix bug experienced on Windows systems'
+            desc = 'binary now targets Java 1.7 again'
             vcsTag = pluginVersion
             attributes = ['gradle-plugin': 'de.mobilej:de.mobilej.unmock:UnMockPlugin']
         }
