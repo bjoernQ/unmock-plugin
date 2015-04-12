@@ -53,7 +53,10 @@ unMock {
             "org.",
             "libcore.",
             "com.android.internal.R",
-            "com.android.internal.util."
+            "com.android.internal.util.",
+            "android.database.AbstractCursor",
+            "-android.database.MatrixCursor",
+            "-android.net.Uri"
     ]
 }
 ```
