@@ -61,7 +61,12 @@ unMock {
             "org.",
             "libcore.",
             "com.android.internal.R",
-            "com.android.internal.util."
+            "com.android.internal.util.",
+            "-android.net.Uri"
+    ]
+
+    rename = [
+            "java.nio.charset.Charsets=xjava.nio.charset.Charsets"
     ]
 }
 

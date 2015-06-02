@@ -16,6 +16,8 @@
 
 package de.mobilej;
 
+import org.gradle.api.logging.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -26,7 +28,9 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -51,9 +55,17 @@ import javassist.Modifier;
  */
 public class ProcessRealAndroidJar {
 
-    public static void process(String allAndroidSourceUrl, String[] keepClasses, String destFile,
-            String intermediatesDir)
+    public static void process(String allAndroidSourceUrl, String[] keepClasses, String[] renameClasses, String destFile,
+                               String intermediatesDir, File buildFile, Logger logger)
             throws Exception {
+
+        List<ClassMapping> classesToMap = parseClassesToMap(renameClasses, logger);
+
+        List<String> keepClassesList = new ArrayList<>(Arrays.asList(keepClasses));
+        for (ClassMapping mapping : classesToMap) {
+            keepClassesList.add(mapping.from);
+        }
+        keepClasses = keepClassesList.toArray(new String[keepClassesList.size()]);
 
         // DOWNLOAD the wished version
         // e.g. from https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/
@@ -73,11 +85,13 @@ public class ProcessRealAndroidJar {
         }
 
         File out = new File(intermediates, "unmock_work");
-
-        if (out.exists()) {
+        if (out.exists() && buildFile.lastModified() < out.lastModified()) {
+            logger.lifecycle("Already up to date");
             return;
         }
 
+        logger.lifecycle("(re)building");
+        delete(out);
         out.mkdirs();
 
         ArrayList<String> clazzNames = findAllClazzesIn(
@@ -117,9 +131,9 @@ public class ProcessRealAndroidJar {
             }
 
             try {
-                process(clazz);
+                process(clazz, classesToMap);
             } catch (Exception e) {
-                System.out.println("-> unable to process:" + e);
+                logger.error("-> unable to process", e);
             }
 
             clazz.writeFile(out.getAbsolutePath());
@@ -128,6 +142,28 @@ public class ProcessRealAndroidJar {
         createJarArchive(destFile,
                 out.getAbsolutePath());
 
+    }
+
+    private static List<ClassMapping> parseClassesToMap(String[] renameClasses, Logger logger) {
+        ArrayList<ClassMapping> result = new ArrayList<>();
+
+        if (renameClasses == null) {
+            return result;
+        }
+
+        for (String classRenaming : renameClasses) {
+            int indexOfEquals = classRenaming.indexOf("=");
+            if (indexOfEquals > 0 && indexOfEquals < classRenaming.length()) {
+                String from = classRenaming.substring(0, indexOfEquals);
+                String to = classRenaming.substring(indexOfEquals + 1);
+                result.add(new ClassMapping(from, to));
+
+            } else {
+                logger.error("Unparseable mapping:" + classRenaming);
+            }
+        }
+
+        return result;
     }
 
     public static boolean createJarArchive(String outfile, String srcFolder) throws Exception {
@@ -230,7 +266,7 @@ public class ProcessRealAndroidJar {
         return res;
     }
 
-    private static void process(CtClass clazz) throws Exception {
+    private static void process(CtClass clazz, List<ClassMapping> classMappings) throws Exception {
 
         if (clazz.isInterface()) {
             return;
@@ -295,5 +331,46 @@ public class ProcessRealAndroidJar {
 
         }
 
+
+        for (ClassMapping mapping : classMappings) {
+            clazz.replaceClassName(mapping.from, mapping.to);
+        }
+    }
+
+    public static boolean delete(File file) {
+        File[] flist = null;
+
+        if (file == null) {
+            return false;
+        }
+
+        if (file.isFile()) {
+            return file.delete();
+        }
+
+        if (!file.isDirectory()) {
+            return false;
+        }
+
+        flist = file.listFiles();
+        if (flist != null && flist.length > 0) {
+            for (File f : flist) {
+                if (!delete(f)) {
+                    return false;
+                }
+            }
+        }
+
+        return file.delete();
+    }
+
+    public static class ClassMapping {
+        public final String from;
+        public final String to;
+
+        public ClassMapping(String from, String to) {
+            this.from = from;
+            this.to = to;
+        }
     }
 }

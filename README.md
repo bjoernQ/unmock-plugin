@@ -63,7 +63,7 @@ unMock {
 
 That's it. I use the android-all.jar from the Robolectric project for convenience.
 
-Have a look at the example contained in this repository.
+Have a look at the example contained in this repository for more details.
 
 ## Versions
 
@@ -73,10 +73,7 @@ Have a look at the example contained in this repository.
 |0.1.1|added the '-' matching|
 |0.1.2|fixed a bug preventing the plugin to work correctly on Windows systems|
 |0.1.3|the binary is targeting Java 1.7, again|
-
-## Known Issues
-
-When changing the classes to be included from the real Android jar you'll need a "gradle clean".
+|0.2.0|support class renaming, rebuild jar if build file changed|
 
 ## License
 

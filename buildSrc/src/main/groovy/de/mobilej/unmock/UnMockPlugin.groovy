@@ -38,8 +38,11 @@ class UnMockPlugin implements Plugin<Project> {
         project.task('unMock') << {
 
             ProcessRealAndroidJar.process(project.unMock.allAndroid, project.unMock.keep,
+                    project.unMock.rename,
                     "$project.buildDir/intermediates/unmocked-android.jar",
-                    "$project.buildDir/intermediates/")
+                    "$project.buildDir/intermediates/",
+                    project.buildFile,
+                    project.logger)
 
         }
 
@@ -61,4 +64,6 @@ class UnMockExtension {
     String allAndroid
 
     String[] keep
+
+    String[] rename
 }
