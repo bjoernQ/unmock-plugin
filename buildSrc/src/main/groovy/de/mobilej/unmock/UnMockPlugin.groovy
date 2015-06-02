@@ -35,14 +35,29 @@ class UnMockPlugin implements Plugin<Project> {
 
         project.extensions.create("unMock", UnMockExtension)
 
-        project.task('unMock') << {
+        project.task('unMock')  {
 
-            ProcessRealAndroidJar.process(project.unMock.allAndroid, project.unMock.keep,
-                    project.unMock.rename,
-                    "$project.buildDir/intermediates/unmocked-android.jar",
-                    "$project.buildDir/intermediates/",
-                    project.buildFile,
-                    project.logger)
+            outputs.upToDateWhen {
+                return ProcessRealAndroidJar.isUpToDate(
+                        project.unMock.allAndroid,
+                        project.unMock.keep.toArray(new String[project.unMock.keep.size()]),
+                        project.unMock.rename.toArray(new String[project.unMock.rename.size()]),
+                        "$project.buildDir/intermediates/unmocked-android.jar",
+                        "$project.buildDir/intermediates/",
+                        project.buildFile,
+                        project.logger)
+            }
+
+            doLast {
+                ProcessRealAndroidJar.process(
+                        project.unMock.allAndroid,
+                        project.unMock.keep.toArray(new String[project.unMock.keep.size()]),
+                        project.unMock.rename.toArray(new String[project.unMock.rename.size()]),
+                        "$project.buildDir/intermediates/unmocked-android.jar",
+                        "$project.buildDir/intermediates/",
+                        project.buildFile,
+                        project.logger)
+            }
 
         }
 
@@ -63,7 +78,24 @@ class UnMockExtension {
 
     String allAndroid
 
-    String[] keep
+    ArrayList<String> keep = new ArrayList<>()
 
-    String[] rename
+    ArrayList<String> rename = new ArrayList<>()
+
+    void downloadFrom(final String allAndroidUrl){
+        allAndroid = allAndroidUrl
+    }
+
+    void keep(final String clazz){
+        keep.add("-"+clazz)
+    }
+
+    void keepStartingWith(final String clazz){
+        keep.add(clazz)
+    }
+
+    void keepAndRename(final String clazz){
+        rename.add(clazz)
+    }
+
 }

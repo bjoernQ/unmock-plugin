@@ -55,9 +55,27 @@ import javassist.Modifier;
  */
 public class ProcessRealAndroidJar {
 
+
+    public static boolean isUpToDate(String allAndroidSourceUrl, String[] keepClasses, String[] renameClasses, String destFile,
+                               String intermediatesDir, File buildFile, Logger logger)
+            throws Exception {
+
+        final File intermediates = new File(intermediatesDir);
+        File out = new File(intermediates, "unmock_work");
+        if (out.exists() && buildFile.lastModified() < out.lastModified()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static void process(String allAndroidSourceUrl, String[] keepClasses, String[] renameClasses, String destFile,
                                String intermediatesDir, File buildFile, Logger logger)
             throws Exception {
+
+        if(allAndroidSourceUrl==null){
+            throw new IllegalArgumentException("No URL specified to download the full Android jar.");
+        }
 
         List<ClassMapping> classesToMap = parseClassesToMap(renameClasses, logger);
 
@@ -86,11 +104,9 @@ public class ProcessRealAndroidJar {
 
         File out = new File(intermediates, "unmock_work");
         if (out.exists() && buildFile.lastModified() < out.lastModified()) {
-            logger.lifecycle("Already up to date");
             return;
         }
 
-        logger.lifecycle("(re)building");
         delete(out);
         out.mkdirs();
 
