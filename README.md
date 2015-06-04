@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.1.1'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.3.0'
     }
 }
 ```
@@ -35,31 +35,28 @@ Additionally you have to configure which classes to use and where to get the rea
 ```groovy
 unMock {
     // URI to download the android-all.jar from. e.g. https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/
-    allAndroid =
-            'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
+    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
 
-    // classes to keep
-    // matched by "startsWith" - you also need to include the dependencies manually
-    // if you start with an "-" the class will match by "equals" (and it will additionally  match
-    // inner classes of this class)
-    keep = [
-            "android.text.TextUtils",
-            "android.util.",
-            "android.text.",
-            "android.content.ContentValues",
-            "android.content.Intent",
-            "-android.location.Location",
-            "android.content.res.Configuration",
-            "org.",
-            "libcore.",
-            "com.android.internal.R",
-            "com.android.internal.util.",
-            "android.database.AbstractCursor",
-            "-android.database.MatrixCursor",
-            "-android.net.Uri"
-    ]
+    keepStartingWith "android.text.TextUtils"
+    keepStartingWith "android.util."
+    keepStartingWith "android.text."
+    keepStartingWith "android.content.ContentValues"
+    keepStartingWith "android.content.Intent"
+    keep "android.location.Location"
+    keepStartingWith "android.content.res.Configuration"
+    keepStartingWith "org."
+    keepStartingWith "libcore."
+    keepStartingWith "com.android.internal.R"
+    keepStartingWith "com.android.internal.util."
+    keep "android.net.Uri"
+
+    keepAndRename "java.nio.charset.Charsets" to "xjava.nio.charset.Charsets"
 }
 ```
+
+keep keeps the specified class (and it's possible present inner classes)
+keepStartingWith keeps every class which FQN starts with the given string
+keepAndRename let you keep a class while renaming it (e.g. needed for classes in the "java" top-level package since these are only allowed to be loaded from the boot classpath)
 
 That's it. I use the android-all.jar from the Robolectric project for convenience.
 
@@ -74,6 +71,7 @@ Have a look at the example contained in this repository for more details.
 |0.1.2|fixed a bug preventing the plugin to work correctly on Windows systems|
 |0.1.3|the binary is targeting Java 1.7, again|
 |0.2.0|support class renaming, rebuild jar if build file changed|
+|0.3.0|use Gradle way of upToDate check, have a DSL for the configuration|
 
 ## License
 

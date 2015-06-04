@@ -43,31 +43,22 @@ android {
 
 unMock {
     // URI to download the android-all.jar from. e.g. https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/
-    allAndroid =
-            'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
+    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
 
-    // classes to keep
-    // matched by "startsWith" - you also need to include the dependencies manually
-    // if you start with an "-" the class will match by "equals" (and it will additionally  match
-    // inner classes of this class)
-    keep = [
-            "android.text.TextUtils",
-            "android.util.",
-            "android.text.",
-            "android.content.ContentValues",
-            "android.content.Intent",
-            "-android.location.Location",
-            "android.content.res.Configuration",
-            "org.",
-            "libcore.",
-            "com.android.internal.R",
-            "com.android.internal.util.",
-            "-android.net.Uri"
-    ]
+    keepStartingWith "android.text.TextUtils"
+    keepStartingWith "android.util."
+    keepStartingWith "android.text."
+    keepStartingWith "android.content.ContentValues"
+    keepStartingWith "android.content.Intent"
+    keep "android.location.Location"
+    keepStartingWith "android.content.res.Configuration"
+    keepStartingWith "org."
+    keepStartingWith "libcore."
+    keepStartingWith "com.android.internal.R"
+    keepStartingWith "com.android.internal.util."
+    keep "android.net.Uri"
 
-    rename = [
-            "java.nio.charset.Charsets=xjava.nio.charset.Charsets"
-    ]
+    keepAndRename "java.nio.charset.Charsets" to "xjava.nio.charset.Charsets"
 }
 
 dependencies {
