@@ -94,8 +94,22 @@ class UnMockExtension {
         keep.add(clazz)
     }
 
-    void keepAndRename(final String clazz){
-        rename.add(clazz)
+    KeepMapping keepAndRename(final String clazzToKeep) {
+        return new KeepMapping(clazzToKeep, this)
     }
 
+}
+
+class KeepMapping {
+    String keep
+    UnMockExtension extension
+
+    KeepMapping(final String whatToKeep, UnMockExtension extension) {
+        keep = whatToKeep
+        this.extension = extension
+    }
+
+    void to(final String renameTo) {
+        extension.rename.add(keep + "=" + renameTo)
+    }
 }

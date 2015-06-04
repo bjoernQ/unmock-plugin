@@ -58,8 +58,7 @@ unMock {
     keepStartingWith "com.android.internal.util."
     keep "android.net.Uri"
 
-    keepAndRename "java.nio.charset.Charsets=xjava.nio.charset.Charsets"
-
+    keepAndRename "java.nio.charset.Charsets" to "xjava.nio.charset.Charsets"
 }
 
 dependencies {
