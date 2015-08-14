@@ -113,7 +113,9 @@ public class ProcessRealAndroidJar {
         ArrayList<String> clazzNames = findAllClazzesIn(
                 allAndroidFile.getAbsolutePath());
 
-        ClassPool pool = ClassPool.getDefault();
+        ClassPool pool = new ClassPool(null);
+        pool.appendSystemPath();
+
         pool.insertClassPath(allAndroidFile.getAbsolutePath());
 
         createHelperClasses(out, pool);
