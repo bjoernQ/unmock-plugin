@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.3.0'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.3.3'
     }
 }
 ```
@@ -72,6 +72,9 @@ Have a look at the example contained in this repository for more details.
 |0.1.3|the binary is targeting Java 1.7, again|
 |0.2.0|support class renaming, rebuild jar if build file changed|
 |0.3.0|use Gradle way of upToDate check, have a DSL for the configuration|
+|0.3.1|compile with Gradle 2.4|
+|0.3.2|lib-sample and some bugfixes (frozen class problem)|
+|0.3.3|Android Gradle Plugin 1.3.0 compatibility|
 
 ## License
 

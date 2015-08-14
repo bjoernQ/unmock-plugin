@@ -18,7 +18,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-def pluginVersion = '0.3.2'
+def pluginVersion = '0.3.3'
 
 buildscript {
     repositories {
@@ -92,7 +92,7 @@ bintray {
 
         version {
             name = pluginVersion //Bintray logical version name
-            desc = 'bug fix'
+            desc = 'works with Android Gradle plugin 1.3.x'
             vcsTag = pluginVersion
             attributes = ['gradle-plugin': 'de.mobilej:de.mobilej.unmock:UnMockPlugin']
         }
