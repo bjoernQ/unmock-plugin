@@ -64,7 +64,7 @@ class UnMockPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.tasks.each {
                 task ->
-                    if (task.name ==~ /compile.*UnitTestJava/) {
+                    if (task.name ==~ /compile.*UnitTestJava.*/) {
                         task.dependsOn('unMock')
                     }
             }
