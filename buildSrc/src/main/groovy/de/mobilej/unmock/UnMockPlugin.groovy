@@ -82,22 +82,67 @@ class UnMockExtension {
 
     ArrayList<String> rename = new ArrayList<>()
 
+    boolean usingDefaults = false
+
+    public UnMockExtension() {
+        downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
+
+        keep "android.widget.BaseAdapter"
+        keep "android.widget.ArrayAdapter"
+        keep "android.os.Bundle"
+        keepStartingWith "android.database.MatrixCursor"
+        keep "android.database.AbstractCursor"
+        keep "android.database.CrossProcessCursor"
+        keepStartingWith "android.text.TextUtils"
+        keepStartingWith "android.util."
+        keepStartingWith "android.text."
+        keepStartingWith "android.content.ContentValues"
+        keepStartingWith "android.content.ComponentName"
+        keepStartingWith "android.content.ContentUris"
+        keepStartingWith "android.content.ContentProviderOperation"
+        keepStartingWith "android.content.ContentProviderResult"
+        keepStartingWith "android.content.UriMatcher"
+        keepStartingWith "android.content.Intent"
+        keep "android.location.Location"
+        keepStartingWith "android.content.res.Configuration"
+        keepStartingWith "org."
+        keepStartingWith "libcore."
+        keepStartingWith "com.android.internal.R"
+        keepStartingWith "com.android.internal.util."
+        keep "android.net.Uri"
+
+        keepAndRename "java.nio.charset.Charsets" to "xjava.nio.charset.Charsets"
+
+        usingDefaults = true
+    }
+
     void downloadFrom(final String allAndroidUrl){
         allAndroid = allAndroidUrl
     }
 
     void keep(final String clazz){
+        clearDefaultIfNecessary()
         keep.add("-"+clazz)
     }
 
+
     void keepStartingWith(final String clazz){
+        clearDefaultIfNecessary()
         keep.add(clazz)
     }
 
     KeepMapping keepAndRename(final String clazzToKeep) {
+        clearDefaultIfNecessary()
         return new KeepMapping(clazzToKeep, this)
     }
 
+    private void clearDefaultIfNecessary() {
+        if (usingDefaults) {
+            usingDefaults = false
+            keep.clear()
+            rename.clear()
+        }
+    }
 }
 
 class KeepMapping {
