@@ -36,28 +36,7 @@ android {
     }
 }
 
-unMock {
-    // URI to download the android-all.jar from. e.g. https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/
-    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
-
-    keep "android.widget.BaseAdapter"
-    keep "android.widget.ArrayAdapter"
-    keep "android.os.Bundle"
-    keepStartingWith "android.text.TextUtils"
-    keepStartingWith "android.util."
-    keepStartingWith "android.text."
-    keepStartingWith "android.content.ContentValues"
-    keepStartingWith "android.content.Intent"
-    keep "android.location.Location"
-    keepStartingWith "android.content.res.Configuration"
-    keepStartingWith "org."
-    keepStartingWith "libcore."
-    keepStartingWith "com.android.internal.R"
-    keepStartingWith "com.android.internal.util."
-    keep "android.net.Uri"
-
-    keepAndRename "java.nio.charset.Charsets" to "xjava.nio.charset.Charsets"
-}
+// this time no config closure for the unmock plugin - use the defaults
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
