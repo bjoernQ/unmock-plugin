@@ -65,8 +65,9 @@ unMock {
 }
 ```
 
-|Version|Description|
+|Statement|Description|
 |-------|-----------|
+|downloadFrom|here you configure the url to download the android-all.jar from|
 |keep|keeps the specified class (and it's possibly present inner classes)|
 |keepStartingWith|keeps every class which FQN starts with the given string|
 |keepAndRename|let you keep a class while renaming it (e.g. needed for classes in the "java" top-level package since these are only allowed to be loaded from the boot classpath)|
