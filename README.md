@@ -67,7 +67,7 @@ unMock {
 
 |Statement|Description|
 |-------|-----------|
-|downloadFrom|here you configure the url to download the android-all.jar from|
+|downloadFrom|here you configure the url to download the android-all.jar from, optionally you can specify a directory to download the file to (e.g. to '<directory>') - the default is the tmpdir|
 |keep|keeps the specified class (and it's possibly present inner classes)|
 |keepStartingWith|keeps every class which FQN starts with the given string|
 |keepAndRename|let you keep a class while renaming it (e.g. needed for classes in the "java" top-level package since these are only allowed to be loaded from the boot classpath)|
@@ -96,6 +96,7 @@ If you use any of the keep statements the default configuration will be cleared.
 |0.3.2|lib-sample and some bugfixes (frozen class problem)|
 |0.3.3|Android Gradle Plugin 1.3.0 compatibility|
 |0.3.5|Use default config if no configuration closure is given|
+|0.3.6|Optionally you can specify a directory to download the all-android.jar to|
 
 ## License
 

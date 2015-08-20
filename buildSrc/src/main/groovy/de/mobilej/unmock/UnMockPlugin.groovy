@@ -35,11 +35,12 @@ class UnMockPlugin implements Plugin<Project> {
 
         project.extensions.create("unMock", UnMockExtension)
 
-        project.task('unMock')  {
+        project.task('unMock') {
 
             outputs.upToDateWhen {
                 return ProcessRealAndroidJar.isUpToDate(
                         project.unMock.allAndroid,
+                        project.unMock.downloadTo,
                         project.unMock.keep.toArray(new String[project.unMock.keep.size()]),
                         project.unMock.rename.toArray(new String[project.unMock.rename.size()]),
                         "$project.buildDir/intermediates/unmocked-android.jar",
@@ -51,6 +52,7 @@ class UnMockPlugin implements Plugin<Project> {
             doLast {
                 ProcessRealAndroidJar.process(
                         project.unMock.allAndroid,
+                        project.unMock.downloadTo,
                         project.unMock.keep.toArray(new String[project.unMock.keep.size()]),
                         project.unMock.rename.toArray(new String[project.unMock.rename.size()]),
                         "$project.buildDir/intermediates/unmocked-android.jar",
@@ -77,6 +79,8 @@ class UnMockPlugin implements Plugin<Project> {
 class UnMockExtension {
 
     String allAndroid
+
+    String downloadTo
 
     ArrayList<String> keep = new ArrayList<>()
 
@@ -116,17 +120,18 @@ class UnMockExtension {
         usingDefaults = true
     }
 
-    void downloadFrom(final String allAndroidUrl){
+    DownloadTo downloadFrom(final String allAndroidUrl) {
         allAndroid = allAndroidUrl
+        return new DownloadTo(this)
     }
 
-    void keep(final String clazz){
+    void keep(final String clazz) {
         clearDefaultIfNecessary()
-        keep.add("-"+clazz)
+        keep.add("-" + clazz)
     }
 
 
-    void keepStartingWith(final String clazz){
+    void keepStartingWith(final String clazz) {
         clearDefaultIfNecessary()
         keep.add(clazz)
     }
@@ -156,5 +161,18 @@ class KeepMapping {
 
     void to(final String renameTo) {
         extension.rename.add(keep + "=" + renameTo)
+    }
+}
+
+class DownloadTo {
+    String to
+    UnMockExtension extension
+
+    DownloadTo(UnMockExtension extension) {
+        this.extension = extension
+    }
+
+    void to(final String where) {
+        extension.downloadTo = where
     }
 }

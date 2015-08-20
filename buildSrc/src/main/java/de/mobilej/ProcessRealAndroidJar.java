@@ -45,19 +45,19 @@ import javassist.Modifier;
 
 /**
  * Here the heavy lifting happens.
- *
+ * <p/>
  * We take the all-android.jar and copy the wanted classes to the destination.
- *
+ * <p/>
  * The copied classes will be non-final/non-private and also all methods contained.
- *
+ * <p/>
  * Additionally all native methods will be changed to delegate to de.mobilej.ABridge.callXXX methods
  * for easier mocking.
  */
 public class ProcessRealAndroidJar {
 
 
-    public static boolean isUpToDate(String allAndroidSourceUrl, String[] keepClasses, String[] renameClasses, String destFile,
-                               String intermediatesDir, File buildFile, Logger logger)
+    public static boolean isUpToDate(String allAndroidSourceUrl, String downloadTo, String[] keepClasses, String[] renameClasses, String destFile,
+                                     String intermediatesDir, File buildFile, Logger logger)
             throws Exception {
 
         final File intermediates = new File(intermediatesDir);
@@ -69,11 +69,11 @@ public class ProcessRealAndroidJar {
         return false;
     }
 
-    public static void process(String allAndroidSourceUrl, String[] keepClasses, String[] renameClasses, String destFile,
+    public static void process(String allAndroidSourceUrl, String downloadTo, String[] keepClasses, String[] renameClasses, String destFile,
                                String intermediatesDir, File buildFile, Logger logger)
             throws Exception {
 
-        if(allAndroidSourceUrl==null){
+        if (allAndroidSourceUrl == null) {
             throw new IllegalArgumentException("No URL specified to download the full Android jar.");
         }
 
@@ -91,7 +91,7 @@ public class ProcessRealAndroidJar {
         // https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/5.0.0_r2-robolectric-0/android-all-5.0.0_r2-robolectric-0.jar
 
         final File intermediates = new File(intermediatesDir);
-        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        final File tmpDir = new File(downloadTo == null ? System.getProperty("java.io.tmpdir") : downloadTo);
         File allAndroidFile = new File(tmpDir,
                 allAndroidSourceUrl.replace("/", "_").replace(":", "_"));
 
@@ -222,7 +222,7 @@ public class ProcessRealAndroidJar {
         BufferedInputStream origin;
         FileInputStream fi = new FileInputStream(f);
         origin = new BufferedInputStream(fi, BUFFER);
-        String name = f.getCanonicalPath().substring(root.getCanonicalPath().length() + 1).replace('\\','/');
+        String name = f.getCanonicalPath().substring(root.getCanonicalPath().length() + 1).replace('\\', '/');
         JarEntry entry = new JarEntry(name);
         out.putNextEntry(entry);
         int count;
