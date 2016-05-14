@@ -40,6 +40,7 @@ import java.util.zip.ZipOutputStream;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.Modifier;
 
@@ -56,8 +57,7 @@ import javassist.Modifier;
 public class ProcessRealAndroidJar {
 
 
-    public static boolean isUpToDate(String allAndroidSourceUrl, String downloadTo, String[] keepClasses, String[] renameClasses, String destFile,
-                                     String intermediatesDir, File buildFile, Logger logger)
+    public static boolean isUpToDate(String intermediatesDir, File buildFile)
             throws Exception {
 
         final File intermediates = new File(intermediatesDir);
@@ -69,7 +69,7 @@ public class ProcessRealAndroidJar {
         return false;
     }
 
-    public static void process(String allAndroidSourceUrl, String downloadTo, String[] keepClasses, String[] renameClasses, String destFile,
+    public static void process(String allAndroidSourceUrl, String downloadTo, String[] keepClasses, String[] renameClasses, String[] delegateClasses, String destFile,
                                String intermediatesDir, File buildFile, Logger logger)
             throws Exception {
 
@@ -144,12 +144,27 @@ public class ProcessRealAndroidJar {
                 }
             }
 
-            if (!keep) {
+            boolean delegate = false;
+            for (String delegateClazzName : delegateClasses) {
+                if (clazz.getName().equals(delegateClazzName)) {
+                    delegate = true;
+                    break;
+                } else if (clazz.getName().startsWith(delegateClazzName + "$")) {
+                    delegate = true;
+                    break;
+                }
+            }
+
+            if (!keep && !delegate) {
                 continue;
             }
 
             try {
-                process(clazz, classesToMap);
+                if (keep) {
+                    process(clazz, classesToMap);
+                } else if (delegate) {
+                    processDelegate(clazz, classesToMap);
+                }
             } catch (Exception e) {
                 logger.error("-> unable to process", e);
             }
@@ -282,6 +297,86 @@ public class ProcessRealAndroidJar {
         }
 
         return res;
+    }
+
+    private static void processDelegate(CtClass clazz, List<ClassMapping> classMappings) throws Exception {
+        if (clazz.isInterface()) {
+            return;
+        }
+
+        clazz.defrost();
+
+        clazz.setModifiers(clazz.getModifiers() | Modifier.PUBLIC);
+        clazz.setModifiers(clazz.getModifiers() & ~Modifier.FINAL);
+        clazz.setModifiers(clazz.getModifiers() & ~Modifier.PRIVATE);
+        clazz.setModifiers(clazz.getModifiers() & ~Modifier.PROTECTED);
+
+        CtMethod[] methods = clazz.getDeclaredMethods();
+        for (CtMethod m : methods) {
+            // we delegate every method here
+            String signature = m.getLongName();
+            String thiz = "$0";
+            if ((m.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
+                thiz = "null";
+            }
+
+            String retType = m.getReturnType().getName();
+
+            switch (retType) {
+                case "void":
+                    m.setBody("{ de.mobilej.ABridge.callVoid(\"" + signature + "\", " + thiz
+                            + ", $args); } ");
+                    break;
+                case "boolean":
+                    m.setBody(
+                            "{ return de.mobilej.ABridge.callBoolean(\"" + signature + "\", "
+                                    + thiz
+                                    + ", $args); } ");
+                    break;
+                case "int":
+                    m.setBody(
+                            "{ return de.mobilej.ABridge.callInt(\"" + signature + "\", " + thiz
+                                    + ", $args); } ");
+                    break;
+                case "long":
+                    m.setBody("{ return de.mobilej.ABridge.callLong(\"" + signature + "\", "
+                            + thiz
+                            + ", $args); } ");
+                    break;
+                default:
+                    m.setBody(
+                            "{ return ($r)de.mobilej.ABridge.callObject(\"" + signature + "\","
+                                    + thiz + ", $args); } ");
+                    break;
+            }
+
+
+            m.setModifiers(m.getModifiers() | Modifier.PUBLIC);
+            m.setModifiers(m.getModifiers() & ~Modifier.FINAL);
+            m.setModifiers(m.getModifiers() & ~Modifier.PRIVATE);
+            m.setModifiers(m.getModifiers() & ~Modifier.PROTECTED);
+            m.setModifiers(m.getModifiers() & ~Modifier.NATIVE);
+        }
+
+        CtConstructor[] ctors = clazz.getDeclaredConstructors();
+        for (CtConstructor c : ctors) {
+            // we also delegate every ctor here
+            String signature = c.getLongName();
+            String thiz = "$0";
+
+            c.setBody("{ de.mobilej.ABridge.callVoid(\"" + signature + "\", " + thiz
+                    + ", $args); } ");
+
+            c.setModifiers(c.getModifiers() | Modifier.PUBLIC);
+            c.setModifiers(c.getModifiers() & ~Modifier.FINAL);
+            c.setModifiers(c.getModifiers() & ~Modifier.PRIVATE);
+            c.setModifiers(c.getModifiers() & ~Modifier.PROTECTED);
+            c.setModifiers(c.getModifiers() & ~Modifier.NATIVE);
+        }
+
+        for (ClassMapping mapping : classMappings) {
+            clazz.replaceClassName(mapping.from, mapping.to);
+        }
     }
 
     private static void process(CtClass clazz, List<ClassMapping> classMappings) throws Exception {

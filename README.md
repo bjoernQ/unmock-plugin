@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.3.6'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.4.0'
     }
 }
 ```
@@ -71,6 +71,7 @@ unMock {
 |keep|keeps the specified class (and it's possibly present inner classes)|
 |keepStartingWith|keeps every class which FQN starts with the given string|
 |keepAndRename|let you keep a class while renaming it (e.g. needed for classes in the "java" top-level package since these are only allowed to be loaded from the boot classpath)|
+|delegateClass|every method (and constructor) in the given class is delegated to de.mobilej.ABridge. Makes it easier to mock things in a framework class you inherit from|
 
 That's it. I use the android-all.jar from the Robolectric project for convenience.
 
@@ -97,6 +98,7 @@ If you use any of the keep statements the default configuration will be cleared.
 |0.3.3|Android Gradle Plugin 1.3.0 compatibility|
 |0.3.5|Use default config if no configuration closure is given|
 |0.3.6|Optionally you can specify a directory to download the all-android.jar to|
+|0.4.0|Support for "delegateClass" added|
 
 ## License
 

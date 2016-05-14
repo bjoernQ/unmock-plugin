@@ -18,13 +18,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'de.mobilej.unmock'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "de.mobilej.testproject"
         minSdkVersion 21
-        targetSdkVersion 21
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -70,6 +70,8 @@ unMock {
     keep "android.net.Uri"
 
     keepAndRename "java.nio.charset.Charsets" to "xjava.nio.charset.Charsets"
+
+    delegateClass "android.os.AsyncTask"
 }
 
 dependencies {

@@ -18,7 +18,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-def pluginVersion = '0.3.6'
+def pluginVersion = '0.4.0'
 
 buildscript {
     repositories {
@@ -47,7 +47,7 @@ tasks.withType(JavaCompile) {
 }
 
 task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
+    from sourceSets.main.allSource
 }
 
 publishing {
@@ -92,7 +92,7 @@ bintray {
 
         version {
             name = pluginVersion //Bintray logical version name
-            desc = 'optionally you can specify a directory to download the all-android.jar to, now'
+            desc = 'supports delegateClass, now'
             vcsTag = pluginVersion
             attributes = ['gradle-plugin': 'de.mobilej:de.mobilej.unmock:UnMockPlugin']
         }
