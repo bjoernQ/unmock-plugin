@@ -23,7 +23,6 @@ import org.gradle.api.Project
 class UnMockPlugin implements Plugin<Project> {
 
     void apply(Project project) {
-
         try {
             project.dependencies.
                     add("testCompile",
@@ -39,14 +38,8 @@ class UnMockPlugin implements Plugin<Project> {
 
             outputs.upToDateWhen {
                 return ProcessRealAndroidJar.isUpToDate(
-                        project.unMock.allAndroid,
-                        project.unMock.downloadTo,
-                        project.unMock.keep.toArray(new String[project.unMock.keep.size()]),
-                        project.unMock.rename.toArray(new String[project.unMock.rename.size()]),
-                        "$project.buildDir/intermediates/unmocked-android.jar",
                         "$project.buildDir/intermediates/",
-                        project.buildFile,
-                        project.logger)
+                        project.buildFile)
             }
 
             doLast {
@@ -55,6 +48,7 @@ class UnMockPlugin implements Plugin<Project> {
                         project.unMock.downloadTo,
                         project.unMock.keep.toArray(new String[project.unMock.keep.size()]),
                         project.unMock.rename.toArray(new String[project.unMock.rename.size()]),
+                        project.unMock.delegateClasses.toArray(new String[project.unMock.delegateClasses.size()]),
                         "$project.buildDir/intermediates/unmocked-android.jar",
                         "$project.buildDir/intermediates/",
                         project.buildFile,
@@ -85,6 +79,8 @@ class UnMockExtension {
     ArrayList<String> keep = new ArrayList<>()
 
     ArrayList<String> rename = new ArrayList<>()
+
+    ArrayList<String> delegateClasses = new ArrayList<>()
 
     boolean usingDefaults = false
 
@@ -130,6 +126,10 @@ class UnMockExtension {
         keep.add("-" + clazz)
     }
 
+    void delegateClass(final String clazz) {
+        clearDefaultIfNecessary()
+        delegateClasses.add(clazz)
+    }
 
     void keepStartingWith(final String clazz) {
         clearDefaultIfNecessary()
