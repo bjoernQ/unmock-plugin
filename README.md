@@ -83,7 +83,7 @@ downloadFrom is now optional. If not given it will use 'https://oss.sonatype.org
 
 If you use any of the keep statements the default configuration will be cleared. (So your own configuration is not adding but replaces the default).
 
-> By default the _android-all_ file is downloaded to the system's temporary folder. Some systems purge the temp folder on reboot. In most cases this should be no issue but on unreliable or slow internet conections this might be inconvenient. In that case you could download the _android-all_ file yourself and specify a _file:///\<path\>/\<file\>_ url or you can specify a directory to place the downloaded file by specifying _to_ after the url in _downloadFrom_.
+> By default the _android-all_ file is downloaded to the system's temporary folder. Some systems purge the temp folder on reboot. In most cases this should be no issue but on unreliable or slow internet conections this might be inconvenient. In that case you could download the _android-all_ file yourself and specify a _file:///\<path\>/\<file\>_ url or you can specify a directory to place the downloaded file by specifying _to_ after the url in _downloadFrom_, e.g. ```downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar' to '/yourdirectory_to_download_to'```
 
 ## Versions
 
