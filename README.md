@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.4.0'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.5.0'
     }
 }
 ```
