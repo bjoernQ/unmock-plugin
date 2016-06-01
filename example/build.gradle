@@ -72,6 +72,9 @@ unMock {
     keepAndRename "java.nio.charset.Charsets" to "xjava.nio.charset.Charsets"
 
     delegateClass "android.os.AsyncTask"
+
+    keep "android.os.Parcel"
+    delegateClass "android.hardware.Sensor"
 }
 
 dependencies {

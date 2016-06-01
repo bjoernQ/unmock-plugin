@@ -43,6 +43,7 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.Modifier;
+import javassist.NotFoundException;
 
 /**
  * Here the heavy lifting happens.
@@ -276,6 +277,21 @@ public class ProcessRealAndroidJar {
                         "}", bridge));
 
         bridge.addMethod(CtMethod.make(
+                "public static byte callByte(String signature, Object thiz, Object[] args){" +
+                        "return 0;" +
+                        "}", bridge));
+
+        bridge.addMethod(CtMethod.make(
+                "public static float callFloat(String signature, Object thiz, Object[] args){" +
+                        "return 0f;" +
+                        "}", bridge));
+
+        bridge.addMethod(CtMethod.make(
+                "public static double callDouble(String signature, Object thiz, Object[] args){" +
+                        "return 0d;" +
+                        "}", bridge));
+
+        bridge.addMethod(CtMethod.make(
                 "public static void callVoid(String signature, Object thiz, Object[] args){" +
                         "return;" +
                         "}", bridge));
@@ -314,41 +330,7 @@ public class ProcessRealAndroidJar {
         CtMethod[] methods = clazz.getDeclaredMethods();
         for (CtMethod m : methods) {
             // we delegate every method here
-            String signature = m.getLongName();
-            String thiz = "$0";
-            if ((m.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
-                thiz = "null";
-            }
-
-            String retType = m.getReturnType().getName();
-
-            switch (retType) {
-                case "void":
-                    m.setBody("{ de.mobilej.ABridge.callVoid(\"" + signature + "\", " + thiz
-                            + ", $args); } ");
-                    break;
-                case "boolean":
-                    m.setBody(
-                            "{ return de.mobilej.ABridge.callBoolean(\"" + signature + "\", "
-                                    + thiz
-                                    + ", $args); } ");
-                    break;
-                case "int":
-                    m.setBody(
-                            "{ return de.mobilej.ABridge.callInt(\"" + signature + "\", " + thiz
-                                    + ", $args); } ");
-                    break;
-                case "long":
-                    m.setBody("{ return de.mobilej.ABridge.callLong(\"" + signature + "\", "
-                            + thiz
-                            + ", $args); } ");
-                    break;
-                default:
-                    m.setBody(
-                            "{ return ($r)de.mobilej.ABridge.callObject(\"" + signature + "\","
-                                    + thiz + ", $args); } ");
-                    break;
-            }
+            delegateMethod(m);
 
 
             m.setModifiers(m.getModifiers() | Modifier.PUBLIC);
@@ -379,6 +361,59 @@ public class ProcessRealAndroidJar {
         }
     }
 
+    private static void delegateMethod(CtMethod m) throws NotFoundException, CannotCompileException {
+        String signature = m.getLongName();
+        String thiz = "$0";
+        if ((m.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
+            thiz = "null";
+        }
+
+        String retType = m.getReturnType().getName();
+
+        switch (retType) {
+            case "void":
+                m.setBody("{ de.mobilej.ABridge.callVoid(\"" + signature + "\", " + thiz
+                        + ", $args); } ");
+                break;
+            case "boolean":
+                m.setBody(
+                        "{ return de.mobilej.ABridge.callBoolean(\"" + signature + "\", "
+                                + thiz
+                                + ", $args); } ");
+                break;
+            case "int":
+                m.setBody(
+                        "{ return de.mobilej.ABridge.callInt(\"" + signature + "\", " + thiz
+                                + ", $args); } ");
+                break;
+            case "long":
+                m.setBody("{ return de.mobilej.ABridge.callLong(\"" + signature + "\", "
+                        + thiz
+                        + ", $args); } ");
+                break;
+            case "byte":
+                m.setBody("{ return de.mobilej.ABridge.callByte(\"" + signature + "\", "
+                        + thiz
+                        + ", $args); } ");
+                break;
+            case "float":
+                m.setBody("{ return de.mobilej.ABridge.callFloat(\"" + signature + "\", "
+                        + thiz
+                        + ", $args); } ");
+                break;
+            case "double":
+                m.setBody("{ return de.mobilej.ABridge.callDouble(\"" + signature + "\", "
+                        + thiz
+                        + ", $args); } ");
+                break;
+            default:
+                m.setBody(
+                        "{ return ($r)de.mobilej.ABridge.callObject(\"" + signature + "\","
+                                + thiz + ", $args); } ");
+                break;
+        }
+    }
+
     private static void process(CtClass clazz, List<ClassMapping> classMappings) throws Exception {
 
         if (clazz.isInterface()) {
@@ -399,41 +434,7 @@ public class ProcessRealAndroidJar {
             // we change native to normal method but need to
             // delegate
             if ((m.getModifiers() & Modifier.NATIVE) == Modifier.NATIVE) {
-                String signature = m.getLongName();
-                String thiz = "$0";
-                if ((m.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
-                    thiz = "null";
-                }
-
-                String retType = m.getReturnType().getName();
-
-                switch (retType) {
-                    case "void":
-                        m.setBody("{ de.mobilej.ABridge.callVoid(\"" + signature + "\", " + thiz
-                                + ", $args); } ");
-                        break;
-                    case "boolean":
-                        m.setBody(
-                                "{ return de.mobilej.ABridge.callBoolean(\"" + signature + "\", "
-                                        + thiz
-                                        + ", $args); } ");
-                        break;
-                    case "int":
-                        m.setBody(
-                                "{ return de.mobilej.ABridge.callInt(\"" + signature + "\", " + thiz
-                                        + ", $args); } ");
-                        break;
-                    case "long":
-                        m.setBody("{ return de.mobilej.ABridge.callLong(\"" + signature + "\", "
-                                + thiz
-                                + ", $args); } ");
-                        break;
-                    default:
-                        m.setBody(
-                                "{ return ($r)de.mobilej.ABridge.callObject(\"" + signature + "\","
-                                        + thiz + ", $args); } ");
-                        break;
-                }
+                delegateMethod(m);
             }
 
             m.setModifiers(m.getModifiers() | Modifier.PUBLIC);

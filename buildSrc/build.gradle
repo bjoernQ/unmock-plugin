@@ -18,7 +18,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-def pluginVersion = '0.4.0'
+def pluginVersion = '0.5.0'
 
 buildscript {
     repositories {
@@ -92,7 +92,7 @@ bintray {
 
         version {
             name = pluginVersion //Bintray logical version name
-            desc = 'supports delegateClass, now'
+            desc = 'ABridge now includes callByte, callFloat and callDouble'
             vcsTag = pluginVersion
             attributes = ['gradle-plugin': 'de.mobilej:de.mobilej.unmock:UnMockPlugin']
         }
