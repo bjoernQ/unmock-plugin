@@ -67,7 +67,7 @@ unMock {
 
 |Statement|Description|
 |-------|-----------|
-|downloadFrom|here you configure the url to download the android-all.jar from, optionally you can specify a directory to download the file to (e.g. to '<directory>') - the default is the tmpdir|
+|downloadFrom|here you configure the url to download the android-all.jar from, optionally you can specify a directory to download the file to (e.g. to \<mydirectory\>) - the default is the tmpdir|
 |keep|keeps the specified class (and it's possibly present inner classes)|
 |keepStartingWith|keeps every class which FQN starts with the given string|
 |keepAndRename|let you keep a class while renaming it (e.g. needed for classes in the "java" top-level package since these are only allowed to be loaded from the boot classpath)|
@@ -82,6 +82,8 @@ Starting from version 0.3.5 you can leave out the configuration closure which wi
 downloadFrom is now optional. If not given it will use 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
 
 If you use any of the keep statements the default configuration will be cleared. (So your own configuration is not adding but replaces the default).
+
+> By default the _android-all_ file is downloaded to the system's temporary folder. Some systems purge the temp folder on reboot. In most cases this should be no issue but on unreliable or slow internet conections this might be inconvenient. In that case you could download the _android-all_ file yourself and specify a _file:///\<path\>/\<file\>_ url or you can specify a directory to place the downloaded file by specifying _to_ after the url in _downloadFrom_.
 
 ## Versions
 
