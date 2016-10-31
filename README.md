@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.5.0'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.5.1'
     }
 }
 ```
@@ -102,6 +102,7 @@ If you use any of the keep statements the default configuration will be cleared.
 |0.3.6|Optionally you can specify a directory to download the all-android.jar to|
 |0.4.0|Support for "delegateClass" added|
 |0.5.0|ABridge now includes callByte, callDouble and callFloat, this _might_ break tests that rely on ABrdige.callObject to be called in these cases|
+|0.5.1|Unique names for unmocked-android.jar to workaround an Android Studio problem|
 
 ## License
 

@@ -26,7 +26,7 @@ class UnMockPlugin implements Plugin<Project> {
         try {
             project.dependencies.
                     add("testCompile",
-                            project.files("$project.buildDir/intermediates/unmocked-android.jar"))
+                            project.files("$project.buildDir/intermediates/unmocked-android" + project.name + ".jar"))
         } catch (Exception e) {
             project.logger.warn("Make sure to use Android Gradle plugin version 1.1.0 (or newer)")
             return
@@ -49,7 +49,7 @@ class UnMockPlugin implements Plugin<Project> {
                         project.unMock.keep.toArray(new String[project.unMock.keep.size()]),
                         project.unMock.rename.toArray(new String[project.unMock.rename.size()]),
                         project.unMock.delegateClasses.toArray(new String[project.unMock.delegateClasses.size()]),
-                        "$project.buildDir/intermediates/unmocked-android.jar",
+                        "$project.buildDir/intermediates/unmocked-android" + project.name + ".jar",
                         "$project.buildDir/intermediates/",
                         project.buildFile,
                         project.logger)
