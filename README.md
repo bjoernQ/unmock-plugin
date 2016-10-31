@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.5.1'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.6.0'
     }
 }
 ```
@@ -34,9 +34,6 @@ Additionally you have to configure which classes to use and where to get the rea
 
 ```groovy
 unMock {
-    // URI to download the android-all.jar from. e.g. https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/
-    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
-
     keep "android.widget.BaseAdapter"
     keep "android.widget.ArrayAdapter"
     keep "android.os.Bundle"
@@ -63,17 +60,23 @@ unMock {
 
     keepAndRename "java.nio.charset.Charsets" to "xjava.nio.charset.Charsets"
 }
+
+dependencies {
+    // dependency to android-all to use
+    unmock 'org.robolectric:android-all:4.3_r2-robolectric-0'
+}
+
 ```
 
 |Statement|Description|
 |-------|-----------|
-|downloadFrom|here you configure the url to download the android-all.jar from, optionally you can specify a directory to download the file to (e.g. to \<mydirectory\>) - the default is the tmpdir|
+|downloadFrom|here you configure the url to download the android-all.jar from, optionally you can specify a directory to download the file to (e.g. to \<mydirectory\>) - the default is the tmpdir, _DEPRECATED as of 0.6.0: create a unmock dependency_|
 |keep|keeps the specified class (and it's possibly present inner classes)|
 |keepStartingWith|keeps every class which FQN starts with the given string|
 |keepAndRename|let you keep a class while renaming it (e.g. needed for classes in the "java" top-level package since these are only allowed to be loaded from the boot classpath)|
 |delegateClass|every method (and constructor) in the given class is delegated to de.mobilej.ABridge. Makes it easier to mock things in a framework class you inherit from|
 
-That's it. I use the android-all.jar from the Robolectric project for convenience.
+That's it!
 
 Have a look at the example contained in this repository for more details.
 
@@ -84,6 +87,8 @@ downloadFrom is now optional. If not given it will use 'https://oss.sonatype.org
 If you use any of the keep statements the default configuration will be cleared. (So your own configuration is not adding but replaces the default).
 
 > By default the _android-all_ file is downloaded to the system's temporary folder. Some systems purge the temp folder on reboot. In most cases this should be no issue but on unreliable or slow internet conections this might be inconvenient. In that case you could download the _android-all_ file yourself and specify a _file:///\<path\>/\<file\>_ url or you can specify a directory to place the downloaded file by specifying _to_ after the url in _downloadFrom_, e.g. ```downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar' to '/yourdirectory_to_download_to'```
+
+> As of 0.6.0 you should prefer to use a dependency for the android-all.jar
 
 ## Versions
 
@@ -103,6 +108,7 @@ If you use any of the keep statements the default configuration will be cleared.
 |0.4.0|Support for "delegateClass" added|
 |0.5.0|ABridge now includes callByte, callDouble and callFloat, this _might_ break tests that rely on ABrdige.callObject to be called in these cases|
 |0.5.1|Unique names for unmocked-android.jar to workaround an Android Studio problem|
+|0.6.0|Use Gradle's dependency management to get the android-all.jar|
 
 ## License
 

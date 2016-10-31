@@ -86,19 +86,18 @@ public class ProcessRealAndroidJar {
         }
         keepClasses = keepClassesList.toArray(new String[keepClassesList.size()]);
 
-        // DOWNLOAD the wished version
-        // e.g. from https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/
-        // e.g.:
-        // https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/5.0.0_r2-robolectric-0/android-all-5.0.0_r2-robolectric-0.jar
-
         final File intermediates = new File(intermediatesDir);
         final File tmpDir = new File(downloadTo == null ? System.getProperty("java.io.tmpdir") : downloadTo);
         File allAndroidFile = new File(tmpDir,
                 allAndroidSourceUrl.replace("/", "_").replace(":", "_"));
 
-        if (!allAndroidFile.exists()) {
-            URL website = new URL(allAndroidSourceUrl);
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+        if (allAndroidSourceUrl.startsWith("file:")) {
+            // if it's already a file url there is no need to copy the file
+            allAndroidFile = new File(new URL(allAndroidSourceUrl).toURI().getPath());
+        } else if (!allAndroidFile.exists()) {
+            // otherwise download to tmp dir
+            URL url = new URL(allAndroidSourceUrl);
+            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
             FileOutputStream fos = new FileOutputStream(allAndroidFile);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
         }
