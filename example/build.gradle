@@ -83,5 +83,5 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
     testCompile 'junit:junit:4.11'
 
-    unmock 'org.robolectric:android-all:4.3_r2-robolectric-0'
+    unmock 'org.robolectric:android-all:6.0.0_r1-robolectric-0'
 }

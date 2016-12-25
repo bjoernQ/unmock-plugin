@@ -44,6 +44,8 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
 
 /**
  * Here the heavy lifting happens.
@@ -434,6 +436,8 @@ public class ProcessRealAndroidJar {
             // delegate
             if ((m.getModifiers() & Modifier.NATIVE) == Modifier.NATIVE) {
                 delegateMethod(m);
+            } else {
+                instumentMethod(m);
             }
 
             m.setModifiers(m.getModifiers() | Modifier.PUBLIC);
@@ -448,6 +452,21 @@ public class ProcessRealAndroidJar {
         for (ClassMapping mapping : classMappings) {
             clazz.replaceClassName(mapping.from, mapping.to);
         }
+    }
+
+    private static void instumentMethod(CtMethod m) throws CannotCompileException {
+        m.instrument(new ExprEditor() {
+            public void edit(MethodCall m) throws CannotCompileException {
+                // special handling for System.arrraycopy and VMRuntime
+                if (m.getClassName().equals("java.lang.System") && m.getMethodName().equals("arraycopy")) {
+                    m.replace("{java.lang.System.arraycopy($1,$2,$3,$4,$5);}");
+                } else if (m.getClassName().equals("dalvik.system.VMRuntime") && m.getMethodName().equals("newUnpaddedArray")) {
+                    m.replace("{$_ = java.lang.reflect.Array.newInstance($1,$2);}");
+                } else if (m.getClassName().equals("dalvik.system.VMRuntime") && m.getMethodName().equals("getRuntime")) {
+                    m.replace("{$_ = null;}");
+                }
+            }
+        });
     }
 
     public static boolean delete(File file) {
