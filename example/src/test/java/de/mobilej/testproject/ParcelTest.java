@@ -10,35 +10,45 @@ import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+
+import de.mobilej.ABridge;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.powermock.api.mockito.PowerMockito.doAnswer;
-import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Shows how you can test Parcel
- * IMPROVE rewrite to mock de.mobilej.ABridge's methods
  * <p>
  * Created by bjoern on 25.12.2016.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Parcel.class)
+@PrepareForTest(ABridge.class)
 public class ParcelTest {
     private Parcel parcel;
 
     @Before
     public void setup() {
-        Parcel mockParcel = fakeParcel();
-        mockStatic(Parcel.class);
-        when(Parcel.obtain()).thenReturn(mockParcel);
+        MockParcel();
 
         parcel = Parcel.obtain();
+    }
+
+    @Test
+    public void testTwoParcels() {
+        Parcel p1 = Parcel.obtain();
+        Parcel p2 = Parcel.obtain();
+
+        p1.writeInt(42);
+        p2.writeInt(23);
+
+        assertThat(p2.readInt(), equalTo(23));
+        assertThat(p1.readInt(), equalTo(42));
     }
 
     @Test
@@ -182,36 +192,125 @@ public class ParcelTest {
         parcel.readString();
     }
 
-    public static Parcel fakeParcel() {
-        final ArrayList<Object> data = new ArrayList<>();
-        final int[] indexHolder = new int[]{0};
+    /**
+     * Uses PowerMock to setup mocking/fakeing of android.os.Parcel
+     * <p>
+     * Incomplete implementation only supports read/write int,long,String just to show how it can be done.
+     */
+    public static void MockParcel() {
+        final HashMap<Long, ByteBufferWrapper> data = new HashMap<>();
+        final long fakeNativePtr[] = new long[]{1};
 
-        Parcel parcel = mock(Parcel.class, new Answer() {
+        final Answer defaultAnswer = new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                String method = invocation.getMethod().getName();
+                String method = (String) invocation.getArguments()[0];
+                Object[] realParams = (Object[]) invocation.getArguments()[2];
 
-                if (method.startsWith("write")) {
-                    data.add(invocation.getArguments()[0]);
-                } else if (method.startsWith("read")) {
-                    if (data.size() > indexHolder[0]) {
-                        return data.get(indexHolder[0]++);
-                    } else {
-                        return null;
+                if (method.startsWith("android.os.Parcel.nativeWrite")) {
+                    ByteBufferWrapper buffer = data.get(realParams[0]);
+                    if (buffer == null) {
+                        buffer = new ByteBufferWrapper();
+                        data.put((Long) realParams[0], buffer);
                     }
+
+                    if (method.contains("Int")) {
+                        buffer.putInt((Integer) realParams[1]);
+                    } else if (method.contains("String")) {
+                        buffer.putString((String) realParams[1]);
+                    } else if (method.contains("Long")) {
+                        buffer.putLong((Long) realParams[1]);
+                    }
+                } else if (method.startsWith("android.os.Parcel.nativeRead")) {
+                    ByteBufferWrapper buffer = data.get(realParams[0]);
+                    if (buffer != null) {
+                        if (method.contains("Int")) {
+                            return buffer.getInt();
+                        } else if (method.contains("String")) {
+                            return buffer.getString();
+                        } else if (method.contains("Long")) {
+                            return buffer.getLong();
+                        }
+                    }
+                } else if (method.startsWith("android.os.Parcel.nativeCreate()")) {
+                    return fakeNativePtr[0]++;
                 }
 
                 return null;
             }
-        });
+        };
 
-        doAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                return data.get(indexHolder[0]++);
-            }
-        }).when(parcel).createByteArray();
-        return parcel;
+        mockStatic(ABridge.class, defaultAnswer);
     }
 
+    public static class ByteBufferWrapper {
+        private static final int TYPE_INT = 1;
+        private static final int TYPE_STRING = 2;
+        private static final int TYPE_LONG = 3;
+
+        private ByteBuffer buffer = ByteBuffer.allocate(500000);
+        private ByteBuffer readBuffer = ByteBuffer.wrap(buffer.array());
+
+        public int getInt() {
+            if (checkType(TYPE_INT)) return 0;
+            return readBuffer.getInt();
+        }
+
+        public void putInt(int v) {
+            buffer.putInt(TYPE_INT);
+            buffer.putInt(v);
+        }
+
+        public long getLong() {
+            if (checkType(TYPE_LONG)) return 0;
+            return readBuffer.getLong();
+        }
+
+        public void putLong(long v) {
+            buffer.putInt(TYPE_LONG);
+            buffer.putLong(v);
+        }
+
+        public String getString() {
+            if (checkType(TYPE_STRING)) return null;
+            int l = readBuffer.getInt();
+            if (l == -1) {
+                return null;
+            }
+            byte[] bytes = new byte[l];
+            readBuffer.get(bytes);
+            try {
+                return new String(bytes, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void putString(String v) {
+            buffer.putInt(TYPE_STRING);
+            if (v == null) {
+                buffer.putInt(-1);
+                return;
+            }
+            byte[] bytes = new byte[0];
+            try {
+                bytes = v.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+            buffer.putInt(bytes.length);
+            buffer.put(bytes);
+        }
+
+        private boolean checkType(int type) {
+            int t = readBuffer.getInt();
+            if (t == 0) {
+                return true;
+            }
+            if (t != type) {
+                throw new ClassCastException();
+            }
+            return false;
+        }
+    }
 }
