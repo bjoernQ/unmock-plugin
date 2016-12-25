@@ -42,9 +42,6 @@ android {
 
 
 unMock {
-    // URI to download the android-all.jar from. e.g. https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/
-    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
-
     keep "android.widget.BaseAdapter"
     keep "android.widget.ArrayAdapter"
     keep "android.os.Bundle"
@@ -74,6 +71,9 @@ unMock {
     delegateClass "android.os.AsyncTask"
 
     keep "android.os.Parcel"
+    keep "android.os.ParcelFileDescriptor"
+    keep "android.os.PersistableBundle"
+
     delegateClass "android.hardware.Sensor"
 }
 
@@ -85,4 +85,6 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-rule:1.6.1'
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
     testCompile 'junit:junit:4.11'
+
+    unmock 'org.robolectric:android-all:6.0.0_r1-robolectric-0'
 }

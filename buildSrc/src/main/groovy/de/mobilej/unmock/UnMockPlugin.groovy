@@ -24,6 +24,8 @@ class UnMockPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         try {
+            project.configurations.create("unmock")
+
             project.dependencies.
                     add("testCompile",
                             project.files("$project.buildDir/intermediates/unmocked-android" + project.name + ".jar"))
@@ -43,8 +45,14 @@ class UnMockPlugin implements Plugin<Project> {
             }
 
             doLast {
+                def allAndroid = project.unMock.allAndroid
+
+                if (project.configurations["unmock"].size() >= 1) {
+                    allAndroid = project.configurations["unmock"].resolve()[0].toURI().toURL().toExternalForm()
+                }
+
                 ProcessRealAndroidJar.process(
-                        project.unMock.allAndroid,
+                        allAndroid,
                         project.unMock.downloadTo,
                         project.unMock.keep.toArray(new String[project.unMock.keep.size()]),
                         project.unMock.rename.toArray(new String[project.unMock.rename.size()]),

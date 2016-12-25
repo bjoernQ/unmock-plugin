@@ -43,15 +43,7 @@ public class AutoDelegateNativeMethodToABridgeTest {
     public void testCallIntDelegation() throws Exception {
         Parcel p = Parcel.obtain();
         mockStatic(ABridge.class);
-        when(ABridge.callInt(eq("android.os.Parcel.nativeReadInt(int)"), any(Object.class), any(Object[].class))).thenReturn(42);
-//        when(ABridge.callInt(anyString(), any(Object.class), any(Object[].class))).thenAnswer(new Answer<Object>() {
-//            @Override
-//            public Object answer(InvocationOnMock invocation) throws Throwable {
-//                System.out.println();
-//                System.out.println("*******************" + invocation.getArguments()[0]);
-//                return null;
-//            }
-//        });
+        when(ABridge.callInt(eq("android.os.Parcel.nativeReadInt(long)"), any(Object.class), any(Object[].class))).thenReturn(42);
         assertEquals(42, p.readInt());
     }
 
@@ -59,7 +51,7 @@ public class AutoDelegateNativeMethodToABridgeTest {
     public void testCallLongDelegation() throws Exception {
         Parcel p = Parcel.obtain();
         mockStatic(ABridge.class);
-        when(ABridge.callLong(eq("android.os.Parcel.nativeReadLong(int)"), any(Object.class), any(Object[].class))).thenReturn(42L);
+        when(ABridge.callLong(eq("android.os.Parcel.nativeReadLong(long)"), any(Object.class), any(Object[].class))).thenReturn(42L);
         assertEquals(42L, p.readLong());
     }
 
@@ -67,7 +59,7 @@ public class AutoDelegateNativeMethodToABridgeTest {
     public void testCallFloatDelegation() throws Exception {
         Parcel p = Parcel.obtain();
         mockStatic(ABridge.class);
-        when(ABridge.callFloat(eq("android.os.Parcel.nativeReadFloat(int)"), any(Object.class), any(Object[].class))).thenReturn(42f);
+        when(ABridge.callFloat(eq("android.os.Parcel.nativeReadFloat(long)"), any(Object.class), any(Object[].class))).thenReturn(42f);
         assertEquals(42f, p.readFloat(), 0f);
     }
 
@@ -75,7 +67,7 @@ public class AutoDelegateNativeMethodToABridgeTest {
     public void testCallDoubleDelegation() throws Exception {
         Parcel p = Parcel.obtain();
         mockStatic(ABridge.class);
-        when(ABridge.callDouble(eq("android.os.Parcel.nativeReadDouble(int)"), any(Object.class), any(Object[].class))).thenReturn(42d);
+        when(ABridge.callDouble(eq("android.os.Parcel.nativeReadDouble(long)"), any(Object.class), any(Object[].class))).thenReturn(42d);
         assertEquals(42d, p.readDouble(), 0d);
     }
 

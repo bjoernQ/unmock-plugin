@@ -44,6 +44,8 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
 
 /**
  * Here the heavy lifting happens.
@@ -86,19 +88,18 @@ public class ProcessRealAndroidJar {
         }
         keepClasses = keepClassesList.toArray(new String[keepClassesList.size()]);
 
-        // DOWNLOAD the wished version
-        // e.g. from https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/
-        // e.g.:
-        // https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/5.0.0_r2-robolectric-0/android-all-5.0.0_r2-robolectric-0.jar
-
         final File intermediates = new File(intermediatesDir);
         final File tmpDir = new File(downloadTo == null ? System.getProperty("java.io.tmpdir") : downloadTo);
         File allAndroidFile = new File(tmpDir,
                 allAndroidSourceUrl.replace("/", "_").replace(":", "_"));
 
-        if (!allAndroidFile.exists()) {
-            URL website = new URL(allAndroidSourceUrl);
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+        if (allAndroidSourceUrl.startsWith("file:")) {
+            // if it's already a file url there is no need to copy the file
+            allAndroidFile = new File(new URL(allAndroidSourceUrl).toURI().getPath());
+        } else if (!allAndroidFile.exists()) {
+            // otherwise download to tmp dir
+            URL url = new URL(allAndroidSourceUrl);
+            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
             FileOutputStream fos = new FileOutputStream(allAndroidFile);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
         }
@@ -435,6 +436,8 @@ public class ProcessRealAndroidJar {
             // delegate
             if ((m.getModifiers() & Modifier.NATIVE) == Modifier.NATIVE) {
                 delegateMethod(m);
+            } else {
+                instumentMethod(m);
             }
 
             m.setModifiers(m.getModifiers() | Modifier.PUBLIC);
@@ -449,6 +452,21 @@ public class ProcessRealAndroidJar {
         for (ClassMapping mapping : classMappings) {
             clazz.replaceClassName(mapping.from, mapping.to);
         }
+    }
+
+    private static void instumentMethod(CtMethod m) throws CannotCompileException {
+        m.instrument(new ExprEditor() {
+            public void edit(MethodCall m) throws CannotCompileException {
+                // special handling for System.arrraycopy and VMRuntime
+                if (m.getClassName().equals("java.lang.System") && m.getMethodName().equals("arraycopy")) {
+                    m.replace("{java.lang.System.arraycopy($1,$2,$3,$4,$5);}");
+                } else if (m.getClassName().equals("dalvik.system.VMRuntime") && m.getMethodName().equals("newUnpaddedArray")) {
+                    m.replace("{$_ = java.lang.reflect.Array.newInstance($1,$2);}");
+                } else if (m.getClassName().equals("dalvik.system.VMRuntime") && m.getMethodName().equals("getRuntime")) {
+                    m.replace("{$_ = null;}");
+                }
+            }
+        });
     }
 
     public static boolean delete(File file) {

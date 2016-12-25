@@ -16,17 +16,17 @@
 
 package de.mobilej.testproject;
 
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.test.mock.MockResources;
+import android.text.format.DateUtils;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.test.mock.MockResources;
-import android.text.format.DateUtils;
 
 import de.mobilej.ABridge;
 import libcore.icu.LocaleData;
@@ -41,13 +41,13 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * For some simple helper we need a complex mock setup.
- *
+ * <p>
  * Here we use DateUtils.formatElapsedTime which internally uses libcore.icu and needs some strings
  * from system resources to work.
- *
+ * <p>
  * The ICU setup is somewhat problematic and here it comes handy that the plugin will change every
  * native method to call de.mobilej.ABridge which can be easily mocked.
- *
+ * <p>
  * Created by bjorn on 16.02.15.
  */
 
@@ -97,7 +97,7 @@ public class ComplexSetupNeededTest {
                 ld.mediumDateFormat = "MMM d, y";
                 ld.mediumTimeFormat = "h:mm:ss a";
                 ld.minimalDaysInFirstWeek = 1;
-                ld.minusSign = '-';
+                ld.minusSign = "-";
                 // ld.narrowAm = "a";
                 // ld.narrowPm = "p";
                 ld.numberPattern = "#,##0.###";
@@ -113,8 +113,8 @@ public class ComplexSetupNeededTest {
                 ld.shortTimeFormat = "h:mm a";
                 ld.shortWeekdayNames = new String[]{"", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri",
                         "Sat"};
-                ld.timeFormat12 = "h:mm a";
-                ld.timeFormat24 = "HH:mm";
+                //ld.timeFormat12 = "h:mm a";
+                //ld.timeFormat24 = "HH:mm";
                 ld.tinyMonthNames = new String[]{"J", "F", "M", "A", "M", "J", "J", "A", "S", "O",
                         "N", "D"};
                 ld.tinyStandAloneMonthNames = new String[]{"J", "F", "M", "A", "M", "J", "J", "A",
@@ -129,7 +129,7 @@ public class ComplexSetupNeededTest {
                 ld.monetarySeparator = '.';
                 ld.patternSeparator = ';';
                 ld.perMill = '‰';
-                ld.percent = '%';
+                ld.percent = "%";
                 ld.zeroDigit = '0';
 
                 return true;
