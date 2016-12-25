@@ -71,6 +71,9 @@ unMock {
     delegateClass "android.os.AsyncTask"
 
     keep "android.os.Parcel"
+    keep "android.os.ParcelFileDescriptor"
+    keep "android.os.PersistableBundle"
+
     delegateClass "android.hardware.Sensor"
 }
 
