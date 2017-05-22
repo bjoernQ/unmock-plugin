@@ -26,8 +26,10 @@ class UnMockPlugin implements Plugin<Project> {
         try {
             project.configurations.create("unmock")
 
+            def whichToUse = Integer.parseInt("" + project.gradle.gradleVersion.charAt(0)) >= 4 ? "testImplementation" : "testCompile"
+
             project.dependencies.
-                    add("testCompile",
+                    add(whichToUse,
                             project.files("$project.buildDir/intermediates/unmocked-android" + project.name + ".jar"))
         } catch (Exception e) {
             project.logger.warn("Make sure to use Android Gradle plugin version 1.1.0 (or newer)")
@@ -68,6 +70,10 @@ class UnMockPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.tasks.each {
                 task ->
+                    if (task.name ==~ /.*Compile.*UnitTest.*/) {
+                        task.dependsOn('unMock')
+                    }
+
                     if (task.name ==~ /compile.*UnitTestJava.*/) {
                         task.dependsOn('unMock')
                     }
