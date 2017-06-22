@@ -111,6 +111,7 @@ If you use any of the keep statements the default configuration will be cleared.
 |0.6.0|Use Gradle's dependency management to get the android-all.jar, more magic to workaround issues using unmocked Android-6.0+ classes|
 |0.6.1|Make it work with Gradle 4.0-milestone and Android Gradle plugin to 3.0.0.-alpha1 while keep it working on previous versions|
 |0.6.2|Make it work with activated Kotlin plugin|
+|0.6.3|Make it possible to use Gradle 4 with Android Gradle plugin < 3.0|
 
 ## License
 

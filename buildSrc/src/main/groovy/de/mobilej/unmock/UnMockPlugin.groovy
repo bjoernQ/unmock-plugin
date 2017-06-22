@@ -23,17 +23,21 @@ import org.gradle.api.Project
 class UnMockPlugin implements Plugin<Project> {
 
     void apply(Project project) {
+        project.configurations.create("unmock")
+
         try {
-            project.configurations.create("unmock")
-
-            def whichToUse = Integer.parseInt("" + project.gradle.gradleVersion.charAt(0)) >= 4 ? "testImplementation" : "testCompile"
-
             project.dependencies.
-                    add(whichToUse,
+                    add("testImplementation",
                             project.files("$project.buildDir/intermediates/unmocked-android" + project.name + ".jar"))
         } catch (Exception e) {
-            project.logger.warn("Make sure to use Android Gradle plugin version 1.1.0 (or newer)")
-            return
+            try {
+                project.dependencies.
+                        add("testCompile",
+                                project.files("$project.buildDir/intermediates/unmocked-android" + project.name + ".jar"))
+            } catch (Exception ee) {
+                project.logger.warn("Make sure to use Android Gradle plugin version 1.1.0 (or newer)")
+                return
+            }
         }
 
         project.extensions.create("unMock", UnMockExtension)
