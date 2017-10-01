@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.6.2'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.6.4'
     }
 }
 ```
@@ -112,6 +112,7 @@ If you use any of the keep statements the default configuration will be cleared.
 |0.6.1|Make it work with Gradle 4.0-milestone and Android Gradle plugin to 3.0.0.-alpha1 while keep it working on previous versions|
 |0.6.2|Make it work with activated Kotlin plugin|
 |0.6.3|Make it possible to use Gradle 4 with Android Gradle plugin < 3.0|
+|0.6.4|Works with kapt3|
 
 ## License
 
