@@ -113,7 +113,7 @@ If you use any of the keep statements the default configuration will be cleared.
 |0.6.2|Make it work with activated Kotlin plugin|
 |0.6.3|Make it possible to use Gradle 4 with Android Gradle plugin < 3.0|
 |0.6.4|Works with kapt3|
-|0.6.4|Also copy non-class files when they are matched by keepStartingWith|
+|0.6.5|Also copy non-class files when they are matched by keepStartingWith|
 
 ## License
 
