@@ -27,6 +27,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -174,6 +179,20 @@ public class ProcessRealAndroidJar {
             clazz.writeFile(out.getAbsolutePath());
         }
 
+        // copy over non-classes matching "keepStartsWith" paths
+        ArrayList<String> toCopy = new ArrayList<>();
+        ArrayList<String> nonClasses = findAllNonClassFilesIn(allAndroidFile.getAbsolutePath());
+        for (String keep : keepClasses) {
+            if (!keep.startsWith("-")) {
+                for (String file : nonClasses) {
+                    if (file.startsWith(keep.replace(".", "/"))) {
+                        toCopy.add(file);
+                    }
+                }
+            }
+        }
+        copyFromJarToDirectory(allAndroidFile.getAbsolutePath(), toCopy, out.getAbsoluteFile());
+
         createJarArchive(destFile,
                 out.getAbsolutePath());
 
@@ -314,6 +333,33 @@ public class ProcessRealAndroidJar {
         }
 
         return res;
+    }
+
+    private static ArrayList<String> findAllNonClassFilesIn(String file) throws IOException {
+        ArrayList<String> res = new ArrayList<String>();
+
+        ZipFile f = new ZipFile(file);
+        Enumeration<? extends ZipEntry> entries = f.entries();
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            if (!entry.isDirectory() && !entry.getName().endsWith(".class")) {
+                res.add(entry.getName());
+            }
+
+        }
+
+        return res;
+    }
+
+    private static void copyFromJarToDirectory(String file, List<String> files, File destDir) throws IOException {
+        try (FileSystem fileSystem = FileSystems.newFileSystem(Paths.get(file), null)) {
+            for (String toCopy : files) {
+                Path source = fileSystem.getPath(toCopy);
+                File dst = new File(destDir, toCopy);
+                dst.getParentFile().mkdirs();
+                Files.copy(source, dst.toPath());
+            }
+        }
     }
 
     private static void processDelegate(CtClass clazz, List<ClassMapping> classMappings) throws Exception {
