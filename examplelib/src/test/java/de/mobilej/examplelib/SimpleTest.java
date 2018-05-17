@@ -18,6 +18,9 @@ package de.mobilej.examplelib;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.icu.text.DateFormat;
+import android.icu.text.DateIntervalFormat;
+import android.icu.util.DateInterval;
 import android.location.Location;
 import android.location.LocationManager;
 import android.text.Editable;
@@ -36,6 +39,8 @@ import org.xmlpull.v1.XmlPullParser;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.FieldPosition;
+import java.util.Locale;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -143,4 +148,15 @@ public class SimpleTest {
         assertEquals(999, sia.get(12));
     }
 
+    @Test
+    public void testIssue42() {
+        DateInterval dtInterval = new DateInterval(1000 * 3600 * 24L, 1000 * 3600 * 24 * 2L);
+        DateIntervalFormat dtIntervalFmt = DateIntervalFormat.getInstance(DateFormat.YEAR_MONTH_DAY, new Locale("en", "GB", ""));
+        StringBuffer str = new StringBuffer("");
+        FieldPosition pos = new FieldPosition(0);
+        // formatting
+        dtIntervalFmt.format(dtInterval, str, pos);
+
+        assertEquals("2 – 3 January 1970", str.toString());
+    }
 }
