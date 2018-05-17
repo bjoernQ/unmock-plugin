@@ -73,6 +73,10 @@ unMock {
     keep "android.os.Parcel"
     keep "android.os.ParcelFileDescriptor"
     keep "android.os.PersistableBundle"
+    keep "android.os.ServiceSpecificException"
+
+    keep "android.os.LocaleList"
+
 
     delegateClass "android.hardware.Sensor"
 }
@@ -86,5 +90,5 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
     testCompile 'junit:junit:4.11'
 
-    unmock 'org.robolectric:android-all:6.0.0_r1-robolectric-0'
+    unmock 'org.robolectric:android-all:7.1.0_r7-robolectric-0'
 }
