@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.6.5'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.7.0'
     }
 }
 ```
@@ -70,7 +70,6 @@ dependencies {
 
 |Statement|Description|
 |-------|-----------|
-|downloadFrom|here you configure the url to download the android-all.jar from, optionally you can specify a directory to download the file to (e.g. to \<mydirectory\>) - the default is the tmpdir, _DEPRECATED as of 0.6.0: create a unmock dependency_|
 |keep|keeps the specified class (and it's possibly present inner classes)|
 |keepStartingWith|keeps every class which FQN starts with the given string|
 |keepAndRename|let you keep a class while renaming it (e.g. needed for classes in the "java" top-level package since these are only allowed to be loaded from the boot classpath)|
@@ -82,13 +81,7 @@ Have a look at the example contained in this repository for more details.
 
 Starting from version 0.3.5 you can leave out the configuration closure which will result using defaults (which are shown in the example above).
 
-downloadFrom is now optional. If not given it will use 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
-
 If you use any of the keep statements the default configuration will be cleared. (So your own configuration is not adding but replaces the default).
-
-> By default the _android-all_ file is downloaded to the system's temporary folder. Some systems purge the temp folder on reboot. In most cases this should be no issue but on unreliable or slow internet conections this might be inconvenient. In that case you could download the _android-all_ file yourself and specify a _file:///\<path\>/\<file\>_ url or you can specify a directory to place the downloaded file by specifying _to_ after the url in _downloadFrom_, e.g. ```downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar' to '/yourdirectory_to_download_to'```
-
-> As of 0.6.0 you should prefer to use a dependency for the android-all.jar
 
 ## Versions
 
@@ -114,11 +107,12 @@ If you use any of the keep statements the default configuration will be cleared.
 |0.6.3|Make it possible to use Gradle 4 with Android Gradle plugin < 3.0|
 |0.6.4|Works with kapt3|
 |0.6.5|Also copy non-class files when they are matched by keepStartingWith|
+|0.7.0|Using downloadFrom will make your build fail - use unmock scoped dependency now|
 
 ## License
 
 ```
-Copyright 2015 Björn Quentin
+Copyright 2015,2016,2017,2018 Björn Quentin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

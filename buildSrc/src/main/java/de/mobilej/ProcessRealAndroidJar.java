@@ -102,11 +102,7 @@ public class ProcessRealAndroidJar {
             // if it's already a file url there is no need to copy the file
             allAndroidFile = new File(new URL(allAndroidSourceUrl).toURI().getPath());
         } else if (!allAndroidFile.exists()) {
-            // otherwise download to tmp dir
-            URL url = new URL(allAndroidSourceUrl);
-            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-            FileOutputStream fos = new FileOutputStream(allAndroidFile);
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            throw new RuntimeException("Something went terribly wrong. Do a clean build and if the problem persists clear you Gradle caches.");
         }
 
         File out = new File(intermediates, "unmock_work");
