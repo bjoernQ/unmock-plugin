@@ -83,6 +83,8 @@ Starting from version 0.3.5 you can leave out the configuration closure which wi
 
 If you use any of the keep statements the default configuration will be cleared. (So your own configuration is not adding but replaces the default).
 
+If you don't configure the unmock dependency the plugin will use `org.robolectric:android-all:4.3_r2-robolectric-0`
+
 ## Versions
 
 |Version|Description|
