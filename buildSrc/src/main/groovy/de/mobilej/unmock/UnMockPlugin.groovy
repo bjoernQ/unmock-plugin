@@ -17,6 +17,7 @@
 package de.mobilej.unmock
 
 import de.mobilej.ProcessRealAndroidJar
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -24,6 +25,7 @@ class UnMockPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         project.configurations.create("unmock")
+        project.dependencies.add("unmock","org.robolectric:android-all:4.3_r2-robolectric-0")
 
         try {
             project.dependencies.
@@ -53,8 +55,14 @@ class UnMockPlugin implements Plugin<Project> {
             doLast {
                 def allAndroid = project.unMock.allAndroid
 
+                if(allAndroid!=null){
+                    throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
+                }
+
                 if (project.configurations["unmock"].size() >= 1) {
-                    allAndroid = project.configurations["unmock"].resolve()[0].toURI().toURL().toExternalForm()
+                    allAndroid = project.configurations["unmock"].resolve()[project.configurations["unmock"].size()-1].toURI().toURL().toExternalForm()
+                } else {
+                    throw new GradleException("Something went terribly wrong. Do a clean build and if the problem persists clear you Gradle caches.")
                 }
 
                 ProcessRealAndroidJar.process(
@@ -99,8 +107,6 @@ class UnMockExtension {
     boolean usingDefaults = false
 
     public UnMockExtension() {
-        downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
-
         keep "android.widget.BaseAdapter"
         keep "android.widget.ArrayAdapter"
         keep "android.os.Bundle"
