@@ -16,7 +16,7 @@
 
 package de.mobilej.unmock
 
-import de.mobilej.ProcessRealAndroidJar
+import de.mobilej.UnMockTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -42,53 +42,37 @@ class UnMockPlugin implements Plugin<Project> {
             }
         }
 
-        project.extensions.create("unMock", UnMockExtension)
+        def unMockExt = project.extensions.create("unMock", UnMockExtension)
 
-        project.task('unMock') {
-
-            outputs.upToDateWhen {
-                return ProcessRealAndroidJar.isUpToDate(
-                        "$project.buildDir/intermediates/",
-                        project.buildFile)
-            }
-
-            doLast {
-                def allAndroid = project.unMock.allAndroid
-
-                if(allAndroid!=null){
-                    throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
-                }
-
-                if (project.configurations["unmock"].size() >= 1) {
-                    allAndroid = project.configurations["unmock"].resolve()[project.configurations["unmock"].size()-1].toURI().toURL().toExternalForm()
-                } else {
-                    throw new GradleException("Something went terribly wrong. Do a clean build and if the problem persists clear you Gradle caches.")
-                }
-
-                ProcessRealAndroidJar.process(
-                        allAndroid,
-                        project.unMock.downloadTo,
-                        project.unMock.keep.toArray(new String[project.unMock.keep.size()]),
-                        project.unMock.rename.toArray(new String[project.unMock.rename.size()]),
-                        project.unMock.delegateClasses.toArray(new String[project.unMock.delegateClasses.size()]),
-                        "$project.buildDir/intermediates/unmocked-android" + project.name + ".jar",
-                        "$project.buildDir/intermediates/",
-                        project.buildFile,
-                        project.logger)
-            }
-
-        }
-
+        def unMockTask = project.tasks.create("unMock", UnMockTask.class)
         project.afterEvaluate {
+            def allAndroid = project.unMock.allAndroid
+
+            if (allAndroid != null) {
+                throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
+            }
+
+            int unmockSize = project.configurations["unmock"].size()
+            if (unmockSize >= 1) {
+                allAndroid = project.configurations["unmock"].resolve()[unmockSize-1]
+            } else {
+                throw new GradleException("Something went terribly wrong. Do a clean build and if the problem persists clear you Gradle caches.")
+            }
+
+            unMockTask.allAndroid = allAndroid
+            unMockTask.outputDir = project.file("${project.buildDir}/intermediates")
+            unMockTask.unmockedOutputJar = project.file("${project.buildDir}/intermediates/unmocked-android${project.name}.jar")
+            unMockTask.keepClasses = unMockExt.keep
+            unMockTask.renameClasses = unMockExt.rename
+            unMockTask.delegateClasses = unMockExt.delegateClasses
+
             project.tasks.each {
                 task ->
                     if (task.name ==~ /.*[cC]ompile.*/) {
-                        task.dependsOn('unMock')
+                        task.dependsOn(unMockTask)
                     }
             }
         }
-
-
     }
 }
 
@@ -98,11 +82,11 @@ class UnMockExtension {
 
     String downloadTo
 
-    ArrayList<String> keep = new ArrayList<>()
+    List<String> keep = new ArrayList<>()
 
-    ArrayList<String> rename = new ArrayList<>()
+    List<String> rename = new ArrayList<>()
 
-    ArrayList<String> delegateClasses = new ArrayList<>()
+    List<String> delegateClasses = new ArrayList<>()
 
     boolean usingDefaults = false
 

@@ -17,6 +17,7 @@
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'java-gradle-plugin'
 
 def pluginVersion = '0.7.0'
 
@@ -104,4 +105,7 @@ dependencies {
     compile localGroovy()
 
     compile 'org.javassist:javassist:3.20.0-GA'
+
+    testCompile 'junit:junit:4.12'
+    testCompile gradleTestKit()
 }

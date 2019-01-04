@@ -24,9 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -65,25 +62,13 @@ import javassist.expr.MethodCall;
 public class ProcessRealAndroidJar {
 
 
-    public static boolean isUpToDate(String intermediatesDir, File buildFile)
-            throws Exception {
-
-        final File intermediates = new File(intermediatesDir);
-        File out = new File(intermediates, "unmock_work");
-        if (out.exists() && buildFile.lastModified() < out.lastModified()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public static void process(String allAndroidSourceUrl, String downloadTo, String[] keepClasses, String[] renameClasses, String[] delegateClasses, String destFile,
-                               String intermediatesDir, File buildFile, Logger logger)
-            throws Exception {
-
-        if (allAndroidSourceUrl == null) {
-            throw new IllegalArgumentException("No URL specified to download the full Android jar.");
-        }
+    public static void process(File allAndroidFile,
+                               File outputDir,
+                               File unmockedOutputJar,
+                               String[] keepClasses,
+                               String[] renameClasses,
+                               String[] delegateClasses,
+                               Logger logger) throws Exception {
 
         List<ClassMapping> classesToMap = parseClassesToMap(renameClasses, logger);
 
@@ -91,25 +76,9 @@ public class ProcessRealAndroidJar {
         for (ClassMapping mapping : classesToMap) {
             keepClassesList.add(mapping.from);
         }
-        keepClasses = keepClassesList.toArray(new String[keepClassesList.size()]);
+        keepClasses = keepClassesList.toArray(new String[0]);
 
-        final File intermediates = new File(intermediatesDir);
-        final File tmpDir = new File(downloadTo == null ? System.getProperty("java.io.tmpdir") : downloadTo);
-        File allAndroidFile = new File(tmpDir,
-                allAndroidSourceUrl.replace("/", "_").replace(":", "_"));
-
-        if (allAndroidSourceUrl.startsWith("file:")) {
-            // if it's already a file url there is no need to copy the file
-            allAndroidFile = new File(new URL(allAndroidSourceUrl).toURI().getPath());
-        } else if (!allAndroidFile.exists()) {
-            throw new RuntimeException("Something went terribly wrong. Do a clean build and if the problem persists clear you Gradle caches.");
-        }
-
-        File out = new File(intermediates, "unmock_work");
-        if (out.exists() && buildFile.lastModified() < out.lastModified()) {
-            return;
-        }
-
+        File out = new File(outputDir, "unmock_work");
         delete(out);
         out.mkdirs();
 
@@ -189,8 +158,7 @@ public class ProcessRealAndroidJar {
         }
         copyFromJarToDirectory(allAndroidFile.getAbsolutePath(), toCopy, out.getAbsoluteFile());
 
-        createJarArchive(destFile,
-                out.getAbsolutePath());
+        createJarArchive(unmockedOutputJar.getAbsolutePath(), out.getAbsolutePath());
 
     }
 
