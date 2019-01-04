@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.7.0'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.7.1'
     }
 }
 ```
@@ -110,6 +110,7 @@ If you don't configure the unmock dependency the plugin will use `org.robolectri
 |0.6.4|Works with kapt3|
 |0.6.5|Also copy non-class files when they are matched by keepStartingWith|
 |0.7.0|Using downloadFrom will make your build fail - use unmock scoped dependency now|
+|0.7.1|Add support for proper Gradle up-to-date checks (thanks to @drewhannay)|
 
 ## License
 
