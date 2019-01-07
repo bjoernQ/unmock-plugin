@@ -23,6 +23,8 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.PathSensitive;
+import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
@@ -35,6 +37,10 @@ import static java.util.Objects.requireNonNull;
  *
  * Actual work is delegated to {@link ProcessRealAndroidJar} but this task handles defining all inputs
  * and outputs so Gradle can do proper up-to-date checking and only run the task when necessary.
+ *
+ * Note that all File properties specify {@link PathSensitivity} NONE. This is because the task does not care
+ * about the names or paths of any of these files. All that matters to this task is that the contents of the
+ * input jar can be read and that data can be written to the output directory and output jar file.
  */
 @CacheableTask
 public class UnMockTask extends DefaultTask {
@@ -47,6 +53,7 @@ public class UnMockTask extends DefaultTask {
     private List<String> delegateClasses;
 
     @InputFile
+    @PathSensitive(PathSensitivity.NONE)
     public File getAllAndroid() {
         return allAndroid;
     }
@@ -56,6 +63,7 @@ public class UnMockTask extends DefaultTask {
     }
 
     @OutputDirectory
+    @PathSensitive(PathSensitivity.NONE)
     public File getOutputDir() {
         return outputDir;
     }
@@ -65,6 +73,7 @@ public class UnMockTask extends DefaultTask {
     }
 
     @OutputFile
+    @PathSensitive(PathSensitivity.NONE)
     public File getUnmockedOutputJar() {
         return unmockedOutputJar;
     }
