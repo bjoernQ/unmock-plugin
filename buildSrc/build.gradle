@@ -27,7 +27,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
@@ -69,8 +69,8 @@ publishing {
 
 bintray {
     /* credentials from ~/.gradle / gradle.properties */
-    user = project.hasProperty('binTrayUser') ? binTrayUser : ''
-    key = project.hasProperty('binTrayKey') ? binTrayKey : ''
+    user = project.hasProperty('bintrayUser') ? bintrayUser : ''
+    key = project.hasProperty('bintrayKey') ? bintrayKey : ''
 
     publications = ['mavenJava'] //When uploading Maven-based publication files
     filesSpec { //When uploading any arbitrary files ('filesSpec' is a standard Gradle CopySpec)
