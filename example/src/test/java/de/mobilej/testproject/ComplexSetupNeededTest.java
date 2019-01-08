@@ -18,7 +18,6 @@ package de.mobilej.testproject;
 
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.test.mock.MockResources;
 import android.text.format.DateUtils;
 
 import org.junit.Test;
@@ -136,7 +135,7 @@ public class ComplexSetupNeededTest {
             }
         });
 
-        Resources mockResources = mock(MockResources.class);
+        Resources mockResources = mock(Resources.class);
         Configuration mockConfiguration = new Configuration();
         when(mockResources.getConfiguration()).thenReturn(mockConfiguration);
 

@@ -27,15 +27,13 @@ class UnMockPlugin implements Plugin<Project> {
         project.configurations.create("unmock")
         project.dependencies.add("unmock","org.robolectric:android-all:4.3_r2-robolectric-0")
 
+        def outputJarPath = "${project.buildDir}/intermediates/unmocked-android${project.name}.jar"
+
         try {
-            project.dependencies.
-                    add("testImplementation",
-                            project.files("$project.buildDir/intermediates/unmocked-android" + project.name + ".jar"))
+            project.dependencies.add("testImplementation", project.files(outputJarPath))
         } catch (Exception e) {
             try {
-                project.dependencies.
-                        add("testCompile",
-                                project.files("$project.buildDir/intermediates/unmocked-android" + project.name + ".jar"))
+                project.dependencies.add("testCompile", project.files(outputJarPath))
             } catch (Exception ee) {
                 project.logger.warn("Make sure to use Android Gradle plugin version 1.1.0 (or newer)")
                 return
@@ -60,8 +58,8 @@ class UnMockPlugin implements Plugin<Project> {
             }
 
             unMockTask.allAndroid = allAndroid
-            unMockTask.outputDir = project.file("${project.buildDir}/intermediates")
-            unMockTask.unmockedOutputJar = project.file("${project.buildDir}/intermediates/unmocked-android${project.name}.jar")
+            unMockTask.outputDir = project.file("${project.buildDir}/intermediates/unmock_work")
+            unMockTask.unmockedOutputJar = project.file(outputJarPath)
             unMockTask.keepClasses = unMockExt.keep
             unMockTask.renameClasses = unMockExt.rename
             unMockTask.delegateClasses = unMockExt.delegateClasses

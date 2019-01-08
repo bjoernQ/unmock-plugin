@@ -18,13 +18,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'de.mobilej.unmock'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "de.mobilej.testproject"
         minSdkVersion 21
-        targetSdkVersion 23
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
@@ -82,13 +82,13 @@ unMock {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    testCompile 'org.powermock:powermock-api-mockito:1.6.1'
-    testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.1'
-    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.1'
-    testCompile 'org.powermock:powermock-module-junit4:1.6.1'
-    testCompile 'junit:junit:4.11'
+    testImplementation 'org.powermock:powermock-api-mockito:1.6.1'
+    testImplementation 'org.powermock:powermock-module-junit4-rule-agent:1.6.1'
+    testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.1'
+    testImplementation 'org.powermock:powermock-module-junit4:1.6.1'
+    testImplementation 'junit:junit:4.11'
 
     unmock 'org.robolectric:android-all:7.1.0_r7-robolectric-0'
 }

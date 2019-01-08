@@ -78,9 +78,8 @@ public class ProcessRealAndroidJar {
         }
         keepClasses = keepClassesList.toArray(new String[0]);
 
-        File out = new File(outputDir, "unmock_work");
-        delete(out);
-        out.mkdirs();
+        delete(outputDir);
+        outputDir.mkdirs();
 
         ArrayList<String> clazzNames = findAllClazzesIn(
                 allAndroidFile.getAbsolutePath());
@@ -90,7 +89,7 @@ public class ProcessRealAndroidJar {
 
         pool.insertClassPath(allAndroidFile.getAbsolutePath());
 
-        createHelperClasses(out, pool);
+        createHelperClasses(outputDir, pool);
 
         for (String clazzName : clazzNames) {
             CtClass clazz = pool.get(clazzName);
@@ -141,7 +140,7 @@ public class ProcessRealAndroidJar {
                 logger.error("-> unable to process", e);
             }
 
-            clazz.writeFile(out.getAbsolutePath());
+            clazz.writeFile(outputDir.getAbsolutePath());
         }
 
         // copy over non-classes matching "keepStartsWith" paths
@@ -156,9 +155,9 @@ public class ProcessRealAndroidJar {
                 }
             }
         }
-        copyFromJarToDirectory(allAndroidFile.getAbsolutePath(), toCopy, out.getAbsoluteFile());
+        copyFromJarToDirectory(allAndroidFile.getAbsolutePath(), toCopy, outputDir.getAbsoluteFile());
 
-        createJarArchive(unmockedOutputJar.getAbsolutePath(), out.getAbsolutePath());
+        createJarArchive(unmockedOutputJar.getAbsolutePath(), outputDir.getAbsolutePath());
 
     }
 
