@@ -19,7 +19,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'java-gradle-plugin'
 
-def pluginVersion = '0.7.1'
+def pluginVersion = '0.7.2'
 
 buildscript {
     repositories {
@@ -93,7 +93,7 @@ bintray {
 
         version {
             name = pluginVersion //Bintray logical version name
-            desc = 'Add support for proper Gradle up-to-date checks'
+            desc = 'Enable relocatable Gradle build cache support'
             vcsTag = pluginVersion
             attributes = ['gradle-plugin': 'de.mobilej:de.mobilej.unmock:UnMockPlugin']
         }
