@@ -18,9 +18,10 @@ package de.mobilej;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.PathSensitive;
@@ -45,20 +46,20 @@ import static java.util.Objects.requireNonNull;
 @CacheableTask
 public class UnMockTask extends DefaultTask {
 
-    private File allAndroid;
+    private FileCollection allAndroid;
     private File outputDir;
     private File unmockedOutputJar;
     private List<String> keepClasses;
     private List<String> renameClasses;
     private List<String> delegateClasses;
 
-    @InputFile
+    @InputFiles
     @PathSensitive(PathSensitivity.NONE)
-    public File getAllAndroid() {
+    public FileCollection getAllAndroid() {
         return allAndroid;
     }
 
-    public void setAllAndroid(File allAndroid) {
+    public void setAllAndroid(FileCollection allAndroid) {
         this.allAndroid = allAndroid;
     }
 
@@ -111,16 +112,17 @@ public class UnMockTask extends DefaultTask {
 
     @TaskAction
     public void unmock() {
-        requireNonNull(allAndroid, "Missing android-all.jar file required for unmocking");
         requireNonNull(outputDir, "No output directory provided for UnMockTask");
         requireNonNull(unmockedOutputJar, "No output file name provided for UnMockTask");
         requireNonNull(keepClasses, "UnMock keep class list cannot be null");
         requireNonNull(renameClasses, "UnMock rename class list cannot be null");
         requireNonNull(delegateClasses, "UnMock delegate class list cannot be null");
 
+        File allAndroidFile = allAndroid.getSingleFile();
+
         try {
             ProcessRealAndroidJar.process(
-                    allAndroid,
+                    allAndroidFile,
                     outputDir,
                     unmockedOutputJar,
                     keepClasses.toArray(new String[0]),
