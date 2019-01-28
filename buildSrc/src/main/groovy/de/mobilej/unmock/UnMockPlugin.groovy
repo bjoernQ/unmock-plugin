@@ -63,7 +63,7 @@ class UnMockPlugin implements Plugin<Project> {
 
             project.tasks.each {
                 task ->
-                    if (task.name ==~ /.*[cC]ompile.*/) {
+                    if (task.name ==~ /.*[cC]ompile.*UnitTest.*/) {
                         task.dependsOn(unMockTask)
                     }
             }
