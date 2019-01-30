@@ -42,7 +42,16 @@ public class UnMockTaskTest {
     private File buildGradle;
 
     private static final String BUILD_GRADLE_CONTENTS = ""
+        + "buildscript {\n"
+        + "    repositories {\n"
+        + "        google()\n"
+        + "    }\n"
+        + "    dependencies {\n"
+        + "        classpath 'com.android.tools.build:gradle:3.3.0'\n"
+        + "    }\n"
+        + "}\n"
         + "plugins { id 'de.mobilej.unmock' apply false }\n"
+        + "apply plugin: 'com.android.application'\n"
         + "\n"
         + "repositories {\n"
         + "    jcenter()\n"
@@ -51,6 +60,17 @@ public class UnMockTaskTest {
         // Since we're not adding AGP as a dependency, we need to create this configuration manually for things to work
         + "configurations { testImplementation }"
         + "\n"
+        + "android {\n"
+        + "compileSdkVersion 28\n"
+        + "buildToolsVersion \"28.0.3\"\n"
+        + "    defaultConfig {\n"
+        + "        applicationId 'com.example.myapp'\n"
+        + "        minSdkVersion 15\n"
+        + "        targetSdkVersion 28\n"
+        + "        versionCode 1\n"
+        + "        versionName \"1.0\"\n"
+        + "  }\n"
+        + "}\n"
         + "apply plugin: 'de.mobilej.unmock'"
         + "\n"
         + "dependencies {\n"
@@ -112,7 +132,7 @@ public class UnMockTaskTest {
     public void unMockTaskPassesOnce() {
         BuildResult result = newGradleRunner().build();
 
-        assertSame(result.task(":unMock").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(result.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
     }
 
     @Test
@@ -120,15 +140,15 @@ public class UnMockTaskTest {
         BuildResult firstResult = newGradleRunner().build();
         BuildResult secondResult = newGradleRunner().build();
 
-        assertSame(firstResult.task(":unMock").getOutcome(), TaskOutcome.SUCCESS);
-        assertSame(secondResult.task(":unMock").getOutcome(), TaskOutcome.UP_TO_DATE);
+        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.UP_TO_DATE);
     }
 
     @Test
     public void unMockTaskIsNotUpToDateIfNewKeepClassAdded() {
         BuildResult firstResult = newGradleRunner().build();
 
-        assertSame(firstResult.task(":unMock").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
 
         writeFile(BUILD_GRADLE_CONTENTS
                       + "unMock {\n"
@@ -138,27 +158,27 @@ public class UnMockTaskTest {
 
         BuildResult secondResult = newGradleRunner().build();
 
-        assertSame(secondResult.task(":unMock").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
     }
 
     @Test
     public void unMockTaskIsNotUpToDateIfOutputDirectoryIsDeleted() {
         BuildResult firstResult = newGradleRunner().build();
 
-        assertSame(firstResult.task(":unMock").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
 
         GFileUtils.deleteDirectory(new File(testProjectDir.getRoot(), "build/intermediates/unmock_work"));
 
         BuildResult secondResult = newGradleRunner().build();
 
-        assertSame(secondResult.task(":unMock").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
     }
 
     @Test
     public void unMockTaskIsNotUpToDateIfOutputJarIsDeleted() {
         BuildResult firstResult = newGradleRunner().build();
 
-        assertSame(firstResult.task(":unMock").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
 
         GFileUtils.forceDelete(new File(testProjectDir.getRoot(),
                                         "build/intermediates/unmocked-android" + testProjectDir.getRoot()
@@ -166,26 +186,26 @@ public class UnMockTaskTest {
 
         BuildResult secondResult = newGradleRunner().build();
 
-        assertSame(secondResult.task(":unMock").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
     }
 
     @Test
     public void unMockTaskIsLoadedFromCacheWhenUsingBuildCache() {
-        BuildResult firstResult = newGradleRunner().withArguments("--build-cache", "unMock").build();
+        BuildResult firstResult = newGradleRunner().withArguments("--build-cache", "unMockDebug").build();
 
-        assertSame(firstResult.task(":unMock").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
 
         GFileUtils.deleteDirectory(new File(testProjectDir.getRoot(), "build"));
 
-        BuildResult secondResult = newGradleRunner().withArguments("--build-cache", "unMock").build();
+        BuildResult secondResult = newGradleRunner().withArguments("--build-cache", "unMockDebug").build();
 
-        assertSame(secondResult.task(":unMock").getOutcome(), TaskOutcome.FROM_CACHE);
+        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.FROM_CACHE);
     }
 
     private GradleRunner newGradleRunner() {
         return GradleRunner.create()
                            .withProjectDir(testProjectDir.getRoot())
                            .withPluginClasspath()
-                           .withArguments("unMock");
+                           .withArguments("unMockDebug");
     }
 }

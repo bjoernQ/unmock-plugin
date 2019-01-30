@@ -41,31 +41,38 @@ class UnMockPlugin implements Plugin<Project> {
 
         def unMockExt = project.extensions.create("unMock", UnMockExtension)
 
-        def unMockTask = project.tasks.create("unMock", UnMockTask.class)
-        project.afterEvaluate {
-            def allAndroid = project.unMock.allAndroid
+        project.configurations["unmock"].defaultDependencies { dependencies ->
+            // If the user doesn't add any dependencies to the unmock configuration, this will be used
+            dependencies.add(project.dependencies.create("org.robolectric:android-all:4.3_r2-robolectric-0"))
+        }
 
-            if (allAndroid != null) {
-                throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
+        def isLib = project.plugins.findPlugin('com.android.library')
+        def isApp = project.plugins.findPlugin('com.android.application')
+
+        if(isLib || isApp) {
+            def mainVariants
+            if (isLib) {
+                mainVariants = project.android.libraryVariants
+            } else {
+                mainVariants = project.android.applicationVariants
             }
 
-            project.configurations["unmock"].defaultDependencies { dependencies ->
-                // If the user doesn't add any dependencies to the unmock configuration, this will be used
-                dependencies.add(project.dependencies.create("org.robolectric:android-all:4.3_r2-robolectric-0"))
-            }
+            mainVariants.all { variant ->
+                 def unMockTask = project.tasks.register("unMock${variant.name.capitalize()}", UnMockTask.class) {
+                     allAndroid = project.unMock.allAndroid
 
-            unMockTask.allAndroid = project.configurations["unmock"]
-            unMockTask.outputDir = project.file("${project.buildDir}/intermediates/unmock_work")
-            unMockTask.unmockedOutputJar = project.file(outputJarPath)
-            unMockTask.keepClasses = unMockExt.keep
-            unMockTask.renameClasses = unMockExt.rename
-            unMockTask.delegateClasses = unMockExt.delegateClasses
+                     if (allAndroid != null) {
+                         throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
+                     }
 
-            project.tasks.each {
-                task ->
-                    if (task.name ==~ /.*[cC]ompile.*UnitTest.*/) {
-                        task.dependsOn(unMockTask)
-                    }
+                     allAndroid = project.configurations["unmock"]
+                     outputDir = project.file("${project.buildDir}/intermediates/unmock_work")
+                     unmockedOutputJar = project.file(outputJarPath)
+                     keepClasses = unMockExt.keep
+                     renameClasses = unMockExt.rename
+                     delegateClasses = unMockExt.delegateClasses
+                 }
+                 variant.javaCompileProvider.configure { dependsOn unMockTask }
             }
         }
     }
