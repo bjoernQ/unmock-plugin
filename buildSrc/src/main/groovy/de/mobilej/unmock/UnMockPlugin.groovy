@@ -50,14 +50,10 @@ class UnMockPlugin implements Plugin<Project> {
         def isApp = project.plugins.findPlugin('com.android.application')
 
         if(isLib || isApp) {
-            def mainVariants
-            if (isLib) {
-                mainVariants = project.android.libraryVariants
-            } else {
-                mainVariants = project.android.applicationVariants
-            }
+            def mainVariants = project.android.unitTestVariants
 
             mainVariants.all { variant ->
+                System.out.println("variantName:" + variant.name)
                  def unMockTask = project.tasks.register("unMock${variant.name.capitalize()}", UnMockTask.class) {
                      allAndroid = project.unMock.allAndroid
 

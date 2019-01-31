@@ -132,7 +132,7 @@ public class UnMockTaskTest {
     public void unMockTaskPassesOnce() {
         BuildResult result = newGradleRunner().build();
 
-        assertSame(result.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(result.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.SUCCESS);
     }
 
     @Test
@@ -140,15 +140,15 @@ public class UnMockTaskTest {
         BuildResult firstResult = newGradleRunner().build();
         BuildResult secondResult = newGradleRunner().build();
 
-        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
-        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.UP_TO_DATE);
+        assertSame(firstResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(secondResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.UP_TO_DATE);
     }
 
     @Test
     public void unMockTaskIsNotUpToDateIfNewKeepClassAdded() {
         BuildResult firstResult = newGradleRunner().build();
 
-        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(firstResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.SUCCESS);
 
         writeFile(BUILD_GRADLE_CONTENTS
                       + "unMock {\n"
@@ -158,27 +158,27 @@ public class UnMockTaskTest {
 
         BuildResult secondResult = newGradleRunner().build();
 
-        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(secondResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.SUCCESS);
     }
 
     @Test
     public void unMockTaskIsNotUpToDateIfOutputDirectoryIsDeleted() {
         BuildResult firstResult = newGradleRunner().build();
 
-        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(firstResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.SUCCESS);
 
         GFileUtils.deleteDirectory(new File(testProjectDir.getRoot(), "build/intermediates/unmock_work"));
 
         BuildResult secondResult = newGradleRunner().build();
 
-        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(secondResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.SUCCESS);
     }
 
     @Test
     public void unMockTaskIsNotUpToDateIfOutputJarIsDeleted() {
         BuildResult firstResult = newGradleRunner().build();
 
-        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(firstResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.SUCCESS);
 
         GFileUtils.forceDelete(new File(testProjectDir.getRoot(),
                                         "build/intermediates/unmocked-android" + testProjectDir.getRoot()
@@ -186,26 +186,26 @@ public class UnMockTaskTest {
 
         BuildResult secondResult = newGradleRunner().build();
 
-        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(secondResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.SUCCESS);
     }
 
     @Test
     public void unMockTaskIsLoadedFromCacheWhenUsingBuildCache() {
         BuildResult firstResult = newGradleRunner().withArguments("--build-cache", "unMockDebug").build();
 
-        assertSame(firstResult.task(":unMockDebug").getOutcome(), TaskOutcome.SUCCESS);
+        assertSame(firstResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.SUCCESS);
 
         GFileUtils.deleteDirectory(new File(testProjectDir.getRoot(), "build"));
 
         BuildResult secondResult = newGradleRunner().withArguments("--build-cache", "unMockDebug").build();
 
-        assertSame(secondResult.task(":unMockDebug").getOutcome(), TaskOutcome.FROM_CACHE);
+        assertSame(secondResult.task(":unMockDebugUnitTest").getOutcome(), TaskOutcome.FROM_CACHE);
     }
 
     private GradleRunner newGradleRunner() {
         return GradleRunner.create()
                            .withProjectDir(testProjectDir.getRoot())
                            .withPluginClasspath()
-                           .withArguments("unMockDebug");
+                           .withArguments("unMockDebugUnitTest");
     }
 }
