@@ -26,24 +26,34 @@ class UnMockPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.configurations.create("unmock")
 
-        def outputJarPath = "${project.buildDir}/intermediates/unmocked-android${project.name}.jar"
-
-        try {
-            project.dependencies.add("testImplementation", project.files(outputJarPath))
-        } catch (Exception e) {
-            try {
-                project.dependencies.add("testCompile", project.files(outputJarPath))
-            } catch (Exception ee) {
-                project.logger.warn("Make sure to use Android Gradle plugin version 1.1.0 (or newer)")
-                return
-            }
-        }
-
         def unMockExt = project.extensions.create("unMock", UnMockExtension)
 
         project.configurations["unmock"].defaultDependencies { dependencies ->
             // If the user doesn't add any dependencies to the unmock configuration, this will be used
             dependencies.add(project.dependencies.create("org.robolectric:android-all:4.3_r2-robolectric-0"))
+        }
+
+        def outputJarPath = "${project.buildDir}/intermediates/unmocked-android${project.name}.jar"
+
+        def unMockTask = project.tasks.register("unMockAndroid", UnMockTask.class) {
+            if (project.unMock.allAndroid != null) {
+                throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
+            }
+
+            allAndroid = project.configurations["unmock"]
+            outputDir = project.file("${project.buildDir}/intermediates/unmock_work")
+            unmockedOutputJar = project.file(outputJarPath)
+            keepClasses = unMockExt.keep
+            renameClasses = unMockExt.rename
+            delegateClasses = unMockExt.delegateClasses
+        }
+
+        def outputJarDependency = project.files(outputJarPath).builtBy("unMockAndroid")
+
+        try {
+            project.dependencies.add("testImplementation", outputJarDependency)
+        } catch (Exception e) {
+            project.logger.warn("Make sure to use Android Gradle plugin version 3.3.0 (or newer)")
         }
 
         def isLib = project.plugins.findPlugin('com.android.library')
@@ -53,21 +63,6 @@ class UnMockPlugin implements Plugin<Project> {
             def mainVariants = project.android.unitTestVariants
 
             mainVariants.all { variant ->
-                System.out.println("variantName:" + variant.name)
-                 def unMockTask = project.tasks.register("unMock${variant.name.capitalize()}", UnMockTask.class) {
-                     allAndroid = project.unMock.allAndroid
-
-                     if (allAndroid != null) {
-                         throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
-                     }
-
-                     allAndroid = project.configurations["unmock"]
-                     outputDir = project.file("${project.buildDir}/intermediates/unmock_work")
-                     unmockedOutputJar = project.file(outputJarPath)
-                     keepClasses = unMockExt.keep
-                     renameClasses = unMockExt.rename
-                     delegateClasses = unMockExt.delegateClasses
-                 }
                  variant.javaCompileProvider.configure { dependsOn unMockTask }
             }
         }
