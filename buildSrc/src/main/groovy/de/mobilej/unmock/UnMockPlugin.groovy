@@ -25,7 +25,6 @@ class UnMockPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         project.configurations.create("unmock")
-        project.dependencies.add("unmock","org.robolectric:android-all:4.3_r2-robolectric-0")
 
         def outputJarPath = "${project.buildDir}/intermediates/unmocked-android${project.name}.jar"
 
@@ -50,14 +49,12 @@ class UnMockPlugin implements Plugin<Project> {
                 throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
             }
 
-            int unmockSize = project.configurations["unmock"].size()
-            if (unmockSize >= 1) {
-                allAndroid = project.configurations["unmock"].resolve()[unmockSize-1]
-            } else {
-                throw new GradleException("Something went terribly wrong. Do a clean build and if the problem persists clear you Gradle caches.")
+            project.configurations["unmock"].defaultDependencies { dependencies ->
+                // If the user doesn't add any dependencies to the unmock configuration, this will be used
+                dependencies.add(project.dependencies.create("org.robolectric:android-all:4.3_r2-robolectric-0"))
             }
 
-            unMockTask.allAndroid = allAndroid
+            unMockTask.allAndroid = project.configurations["unmock"]
             unMockTask.outputDir = project.file("${project.buildDir}/intermediates/unmock_work")
             unMockTask.unmockedOutputJar = project.file(outputJarPath)
             unMockTask.keepClasses = unMockExt.keep
@@ -66,7 +63,7 @@ class UnMockPlugin implements Plugin<Project> {
 
             project.tasks.each {
                 task ->
-                    if (task.name ==~ /.*[cC]ompile.*/) {
+                    if (task.name ==~ /.*[cC]ompile.*UnitTest.*/) {
                         task.dependsOn(unMockTask)
                     }
             }
