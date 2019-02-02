@@ -53,7 +53,7 @@ class UnMockPlugin implements Plugin<Project> {
         //create a unique dependency for all tests variants
         //this dependency is provided by the unique task: when gradle will need it, it will run the task,
         // prior to compilation
-        def outputJarDependency = project.files(outputJarPath).builtBy("unMockAndroid")
+        def outputJarDependency = project.files(outputJarPath).builtBy("unMock")
         //all test variants compile task use the dependency (because it's test implementation)
         try {
             project.dependencies.add("testImplementation", outputJarDependency)
