@@ -26,46 +26,50 @@ class UnMockPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.configurations.create("unmock")
 
-        def outputJarPath = "${project.buildDir}/intermediates/unmocked-android${project.name}.jar"
-
-        try {
-            project.dependencies.add("testImplementation", project.files(outputJarPath))
-        } catch (Exception e) {
-            try {
-                project.dependencies.add("testCompile", project.files(outputJarPath))
-            } catch (Exception ee) {
-                project.logger.warn("Make sure to use Android Gradle plugin version 1.1.0 (or newer)")
-                return
-            }
-        }
-
         def unMockExt = project.extensions.create("unMock", UnMockExtension)
 
-        def unMockTask = project.tasks.create("unMock", UnMockTask.class)
-        project.afterEvaluate {
-            def allAndroid = project.unMock.allAndroid
+        //create a unique configuration with a default dependency to android jar
+        project.configurations["unmock"].defaultDependencies { dependencies ->
+            // If the user doesn't add any dependencies to the unmock configuration, this will be used
+            dependencies.add(project.dependencies.create("org.robolectric:android-all:4.3_r2-robolectric-0"))
+        }
 
-            if (allAndroid != null) {
+        def outputJarPath = "${project.buildDir}/intermediates/unmocked-android${project.name}.jar"
+
+        //create a unique task to unmock for all variants, the task uses the unique configuration
+        def unMockTask = project.tasks.register("unMock", UnMockTask.class) {
+            if (project.unMock.allAndroid != null) {
                 throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
             }
 
-            project.configurations["unmock"].defaultDependencies { dependencies ->
-                // If the user doesn't add any dependencies to the unmock configuration, this will be used
-                dependencies.add(project.dependencies.create("org.robolectric:android-all:4.3_r2-robolectric-0"))
-            }
+            allAndroid = project.configurations["unmock"]
+            outputDir = project.file("${project.buildDir}/intermediates/unmock_work")
+            unmockedOutputJar = project.file(outputJarPath)
+            keepClasses = unMockExt.keep
+            renameClasses = unMockExt.rename
+            delegateClasses = unMockExt.delegateClasses
+        }
 
-            unMockTask.allAndroid = project.configurations["unmock"]
-            unMockTask.outputDir = project.file("${project.buildDir}/intermediates/unmock_work")
-            unMockTask.unmockedOutputJar = project.file(outputJarPath)
-            unMockTask.keepClasses = unMockExt.keep
-            unMockTask.renameClasses = unMockExt.rename
-            unMockTask.delegateClasses = unMockExt.delegateClasses
+        //create a unique dependency for all tests variants
+        //this dependency is provided by the unique task: when gradle will need it, it will run the task,
+        // prior to compilation
+        def outputJarDependency = project.files(outputJarPath).builtBy("unMock")
+        //all test variants compile task use the dependency (because it's test implementation)
+        try {
+            project.dependencies.add("testImplementation", outputJarDependency)
+        } catch (Exception e) {
+            project.logger.warn("Make sure to use Android Gradle plugin version 3.3.0 (or newer)")
+        }
 
-            project.tasks.each {
-                task ->
-                    if (task.name ==~ /.*[cC]ompile.*UnitTest.*/) {
-                        task.dependsOn(unMockTask)
-                    }
+        //as a safe guard I also made each test variants compile task depend on the unique task
+        def isLib = project.plugins.findPlugin('com.android.library')
+        def isApp = project.plugins.findPlugin('com.android.application')
+
+        if(isLib || isApp) {
+            def mainVariants = project.android.unitTestVariants
+
+            mainVariants.all { variant ->
+                 variant.javaCompileProvider.configure { dependsOn unMockTask }
             }
         }
     }

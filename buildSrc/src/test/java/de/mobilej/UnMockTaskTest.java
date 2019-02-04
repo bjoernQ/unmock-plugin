@@ -42,7 +42,16 @@ public class UnMockTaskTest {
     private File buildGradle;
 
     private static final String BUILD_GRADLE_CONTENTS = ""
+        + "buildscript {\n"
+        + "    repositories {\n"
+        + "        google()\n"
+        + "    }\n"
+        + "    dependencies {\n"
+        + "        classpath 'com.android.tools.build:gradle:3.3.0'\n"
+        + "    }\n"
+        + "}\n"
         + "plugins { id 'de.mobilej.unmock' apply false }\n"
+        + "apply plugin: 'com.android.application'\n"
         + "\n"
         + "repositories {\n"
         + "    jcenter()\n"
@@ -51,6 +60,17 @@ public class UnMockTaskTest {
         // Since we're not adding AGP as a dependency, we need to create this configuration manually for things to work
         + "configurations { testImplementation }"
         + "\n"
+        + "android {\n"
+        + "compileSdkVersion 28\n"
+        + "buildToolsVersion \"28.0.3\"\n"
+        + "    defaultConfig {\n"
+        + "        applicationId 'com.example.myapp'\n"
+        + "        minSdkVersion 15\n"
+        + "        targetSdkVersion 28\n"
+        + "        versionCode 1\n"
+        + "        versionName \"1.0\"\n"
+        + "  }\n"
+        + "}\n"
         + "apply plugin: 'de.mobilej.unmock'"
         + "\n"
         + "dependencies {\n"
@@ -184,6 +204,7 @@ public class UnMockTaskTest {
 
     private GradleRunner newGradleRunner() {
         return GradleRunner.create()
+                           //.forwardOutput()
                            .withProjectDir(testProjectDir.getRoot())
                            .withPluginClasspath()
                            .withArguments("unMock");
