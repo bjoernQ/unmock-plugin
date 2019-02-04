@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.7.2'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.7.3'
     }
 }
 ```
@@ -112,6 +112,7 @@ If you don't configure the unmock dependency the plugin will use `org.robolectri
 |0.7.0|Using downloadFrom will make your build fail - use unmock scoped dependency now|
 |0.7.1|Add support for proper Gradle up-to-date checks (thanks to @drewhannay)|
 |0.7.2|Enable relocatable Gradle build cache support (thanks to @drewhannay)|
+|0.7.3|Several internal improvements (PR 52, 53) contributed by  @drewhannay and @stephanenicolas|
 
 ## License
 
