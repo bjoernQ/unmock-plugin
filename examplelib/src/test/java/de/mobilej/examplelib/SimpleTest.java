@@ -157,6 +157,6 @@ public class SimpleTest {
         // formatting
         dtIntervalFmt.format(dtInterval, str, pos);
 
-        assertEquals("2 – 3 January 1970", str.toString());
+        assertEquals("1 – 2 January 1970", str.toString());
     }
 }
