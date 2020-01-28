@@ -19,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.7.3'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.7.4'
     }
 }
 ```
@@ -113,11 +113,12 @@ If you don't configure the unmock dependency the plugin will use `org.robolectri
 |0.7.1|Add support for proper Gradle up-to-date checks (thanks to @drewhannay)|
 |0.7.2|Enable relocatable Gradle build cache support (thanks to @drewhannay)|
 |0.7.3|Several internal improvements (PR 52, 53) contributed by  @drewhannay and @stephanenicolas|
+|0.7.4|Bump Javassist version
 
 ## License
 
 ```
-Copyright 2015,2016,2017,2018,2019 Björn Quentin
+Copyright 2015,2016,2017,2018,2019,2020 Björn Quentin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
