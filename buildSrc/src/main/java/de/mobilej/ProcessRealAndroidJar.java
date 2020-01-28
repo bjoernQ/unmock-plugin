@@ -91,6 +91,8 @@ public class ProcessRealAndroidJar {
 
         createHelperClasses(outputDir, pool);
 
+        List<CtClass> clazzes = new ArrayList<>();
+
         for (String clazzName : clazzNames) {
             CtClass clazz = pool.get(clazzName);
 
@@ -140,6 +142,13 @@ public class ProcessRealAndroidJar {
                 logger.error("-> unable to process", e);
             }
 
+            clazzes.add(clazz);
+        }
+
+        // Write the files after all CtClass objects have been modified, otherwise Javassist
+        // doesn't allow modifying a nested class when the outer class has been written already
+        // (it freezes the outer class again).
+        for (CtClass clazz : clazzes) {
             clazz.writeFile(outputDir.getAbsolutePath());
         }
 
