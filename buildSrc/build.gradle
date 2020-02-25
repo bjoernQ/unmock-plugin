@@ -33,6 +33,7 @@ buildscript {
 
 allprojects {
     repositories {
+        google()
         jcenter()
     }
 }
@@ -105,6 +106,7 @@ dependencies {
     compile localGroovy()
 
     compile 'org.javassist:javassist:3.26.0-GA'
+    compile 'com.android.tools.build:gradle:3.3.0'
 
     testCompile 'junit:junit:4.13'
     testCompile gradleTestKit()

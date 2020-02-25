@@ -16,7 +16,9 @@
 
 package de.mobilej.unmock
 
+import com.android.build.gradle.api.BaseVariant
 import de.mobilej.UnMockTask
+import org.gradle.api.DomainObjectSet
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -50,26 +52,18 @@ class UnMockPlugin implements Plugin<Project> {
             delegateClasses = unMockExt.delegateClasses
         }
 
-        //create a unique dependency for all tests variants
         //this dependency is provided by the unique task: when gradle will need it, it will run the task,
         // prior to compilation
-        def outputJarDependency = project.files(outputJarPath).builtBy("unMock")
-        //all test variants compile task use the dependency (because it's test implementation)
-        try {
-            project.dependencies.add("testImplementation", outputJarDependency)
-        } catch (Exception e) {
-            project.logger.warn("Make sure to use Android Gradle plugin version 3.3.0 (or newer)")
-        }
+        def outputJarDependency = project.files(outputJarPath).builtBy(unMockTask)
 
-        //as a safe guard I also made each test variants compile task depend on the unique task
         def isLib = project.plugins.findPlugin('com.android.library')
         def isApp = project.plugins.findPlugin('com.android.application')
 
-        if(isLib || isApp) {
-            def mainVariants = project.android.unitTestVariants
-
-            mainVariants.all { variant ->
-                 variant.javaCompileProvider.configure { dependsOn unMockTask }
+        // Use custom variants if specified, otherwise fallback to just unit tests for apps and libs
+        project.afterEvaluate {
+            def mainVariants = unMockExt.variants ?: (isLib || isApp ? project.android.unitTestVariants : null)
+            mainVariants?.all { variant ->
+                variant.registerPreJavacGeneratedBytecode(outputJarDependency)
             }
         }
     }
@@ -88,6 +82,8 @@ class UnMockExtension {
     List<String> delegateClasses = new ArrayList<>()
 
     boolean usingDefaults = false
+
+    DomainObjectSet<BaseVariant> variants
 
     public UnMockExtension() {
         keep "android.widget.BaseAdapter"
@@ -137,6 +133,10 @@ class UnMockExtension {
     void keepStartingWith(final String clazz) {
         clearDefaultIfNecessary()
         keep.add(clazz)
+    }
+
+    void includeInVariants(final DomainObjectSet<BaseVariant> customVariants) {
+        this.variants = customVariants
     }
 
     KeepMapping keepAndRename(final String clazzToKeep) {
