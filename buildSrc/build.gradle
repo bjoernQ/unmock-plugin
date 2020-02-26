@@ -19,7 +19,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'java-gradle-plugin'
 
-def pluginVersion = '0.7.4'
+def pluginVersion = '0.7.5'
 
 buildscript {
     repositories {
@@ -94,7 +94,7 @@ bintray {
 
         version {
             name = pluginVersion //Bintray logical version name
-            desc = 'Bump Javassist versions (PR 61)'
+            desc = 'Allow unmocked classes in any variant (PR 62)'
             vcsTag = pluginVersion
             attributes = ['gradle-plugin': 'de.mobilej:de.mobilej.unmock:UnMockPlugin']
         }
