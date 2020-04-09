@@ -105,7 +105,7 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    compile 'org.javassist:javassist:3.26.0-GA'
+    compile 'org.javassist:javassist:3.27.0-GA'
     compile 'com.android.tools.build:gradle:3.3.0'
 
     testCompile 'junit:junit:4.13'
