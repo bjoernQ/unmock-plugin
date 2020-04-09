@@ -115,7 +115,7 @@ If you don't configure the unmock dependency the plugin will use `org.robolectri
 |0.7.3|Several internal improvements (PR 52, 53) contributed by  @drewhannay and @stephanenicolas|
 |0.7.4|Bump Javassist version
 |0.7.5|Allow unmocked classes in any variant (PR 62)
-|0.7.5|Bump Javassist version to 3.27.0-GA
+|0.7.6|Bump Javassist version to 3.27.0-GA
 
 ## License
 
