@@ -48,6 +48,11 @@ task sourceJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -60,6 +65,8 @@ publishing {
             artifact sourceJar {
                 classifier "sources"
             }
+
+            artifact javadocJar
 
             pom {
                 name = 'UnMock Plugin'
