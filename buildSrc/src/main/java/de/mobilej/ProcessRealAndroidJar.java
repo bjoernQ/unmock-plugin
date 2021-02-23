@@ -55,7 +55,7 @@ import javassist.expr.MethodCall;
  * We take the all-android.jar and copy the wanted classes to the destination.
  *
  * The copied classes will be non-final/non-private and also all methods contained.
- * 
+ *
  * Additionally all native methods will be changed to delegate to de.mobilej.ABridge.callXXX methods
  * for easier mocking.
  */

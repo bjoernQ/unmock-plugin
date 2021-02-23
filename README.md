@@ -8,21 +8,21 @@ It tries to solve the problem that you have to mock each and every Android SDK c
 
 ## How to use
 
-Available on jcenter: [ ![Download](https://api.bintray.com/packages/bjoernq/maven/de.mobilej.unmock/images/download.svg) ](https://bintray.com/bjoernq/maven/de.mobilej.unmock/_latestVersion)
-
 Add the plugin to your buildscript dependencies and make sure to use the jcenter repository:
 
 ```groovy
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     
     dependencies {
-        classpath 'de.mobilej.unmock:UnMockPlugin:0.7.6'
+        classpath 'com.github.bjoernq:unmockplugin:0.7.6'
     }
 }
 ```
+
+Please note: Versions prior to 0.7.6 are not available on Maven Central.
 
 And this to the module's build script:
 
