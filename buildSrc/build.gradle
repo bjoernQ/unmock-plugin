@@ -16,7 +16,7 @@
 
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'signing'
 apply plugin: 'java-gradle-plugin'
 
 def pluginVersion = '0.7.6'
@@ -24,10 +24,6 @@ def pluginVersion = '0.7.6'
 buildscript {
     repositories {
         jcenter()
-    }
-
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
@@ -52,11 +48,16 @@ task sourceJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId 'de.mobilej.unmock'
-            artifactId 'UnMockPlugin'
+            group 'com.github.bjoernq'
+            artifactId 'unmockplugin'
             version pluginVersion
 
             from components.java
@@ -64,41 +65,49 @@ publishing {
             artifact sourceJar {
                 classifier "sources"
             }
+
+            artifact javadocJar
+
+            pom {
+                name = 'UnMock Plugin'
+                description = 'Gradle plugin to be used in combination with the new unit testing feature of the Gradle Plugin / Android Studio to use real classes for e.g. SparseArray.'
+                url = 'https://github.com/bjoernq/unmock-plugin'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'bjoernQ'
+                        name = 'Bjoern Quentin'
+                        email = 'bjoern.quentin@mobile-j.de'
+                    }
+                }
+                scm {
+                    connection = 'https://github.com/bjoernq/unmock-plugin'
+                    developerConnection = 'https://github.com/bjoernq/unmock-plugin'
+                    url = 'https://github.com/bjoernq/unmock-plugin'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "central"
+            credentials {
+                username "$centralUsername"
+                password "$centralPassword"
+            }
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
         }
     }
 }
 
-bintray {
-    /* credentials from ~/.gradle / gradle.properties */
-    user = project.hasProperty('bintrayUser') ? bintrayUser : ''
-    key = project.hasProperty('bintrayKey') ? bintrayKey : ''
-
-    publications = ['mavenJava'] //When uploading Maven-based publication files
-    filesSpec { //When uploading any arbitrary files ('filesSpec' is a standard Gradle CopySpec)
-        from 'files'
-        into 'standalone_files/level1'
-        rename '(.+)\\.(.+)', '$1-suffix.$2'
-    }
-    dryRun = false //Whether to run this as dry-run, without deploying
-    publish = true //If version should be auto published after an upload
-    pkg {
-        repo = 'maven'
-        name = 'de.mobilej.unmock'
-        desc = 'Copies classes from an android_all.jar to be used by the new JUnit tests.'
-        websiteUrl = 'https://github.com/bjoernQ/unmock-plugin'
-        issueTrackerUrl = 'https://github.com/bjoernQ/unmock-plugin/issues'
-        vcsUrl = 'https://github.com/bjoernQ/unmock-plugin.git'
-        licenses = ['Apache-2.0']
-        labels = ['android', 'junit']
-        publicDownloadNumbers = true
-
-        version {
-            name = pluginVersion //Bintray logical version name
-            desc = 'Upgrade Javassist to 3.27.0-GA'
-            vcsTag = pluginVersion
-            attributes = ['gradle-plugin': 'de.mobilej:de.mobilej.unmock:UnMockPlugin']
-        }
-    }
+signing {
+    sign publishing.publications.mavenJava
 }
 
 dependencies {
