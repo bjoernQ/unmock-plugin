@@ -64,7 +64,6 @@ public class UnMockTask extends DefaultTask {
     }
 
     @OutputDirectory
-    @PathSensitive(PathSensitivity.NONE)
     public File getOutputDir() {
         return outputDir;
     }
@@ -74,7 +73,6 @@ public class UnMockTask extends DefaultTask {
     }
 
     @OutputFile
-    @PathSensitive(PathSensitivity.NONE)
     public File getUnmockedOutputJar() {
         return unmockedOutputJar;
     }
