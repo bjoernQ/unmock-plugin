@@ -19,7 +19,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'java-gradle-plugin'
 
-def pluginVersion = '0.7.6'
+def pluginVersion = '0.7.8'
 
 buildscript {
     repositories {

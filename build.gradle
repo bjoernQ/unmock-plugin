@@ -28,10 +28,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "com.jfrog.bintray" version "1.8.4"
-}
-
 allprojects {
     repositories {
         google()
