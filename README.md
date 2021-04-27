@@ -8,7 +8,7 @@ It tries to solve the problem that you have to mock each and every Android SDK c
 
 ## How to use
 
-Add the plugin to your buildscript dependencies and make sure to use the jcenter repository:
+Add the plugin to your buildscript dependencies and make sure to use the maven central repository:
 
 ```groovy
 buildscript {
