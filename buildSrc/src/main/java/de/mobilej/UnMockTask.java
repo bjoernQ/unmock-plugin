@@ -126,7 +126,7 @@ public class UnMockTask extends DefaultTask {
                     keepClasses.toArray(new String[0]),
                     renameClasses.toArray(new String[0]),
                     delegateClasses.toArray(new String[0]),
-                    getProject().getLogger()
+                    getLogger()
             );
         } catch (Exception e) {
             throw new GradleException("Exception while unmocking", e);
