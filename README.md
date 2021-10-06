@@ -17,7 +17,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'com.github.bjoernq:unmockplugin:0.7.8'
+        classpath 'com.github.bjoernq:unmockplugin:0.7.9'
     }
 }
 ```
@@ -118,11 +118,12 @@ If you don't configure the unmock dependency the plugin will use `org.robolectri
 |0.7.6|Bump Javassist version to 3.27.0-GA
 |0.7.7| ---
 |0.7.8|Gradle 7.0 compatability, contributed by @calvarez-ov
+|0.7.9|Fix #77, contributed by @matejdro
 
 ## License
 
 ```
-Copyright 2015,2016,2017,2018,2019,2020 Björn Quentin
+Copyright 2015,2016,2017,2018,2019,2020,2021 Björn Quentin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
