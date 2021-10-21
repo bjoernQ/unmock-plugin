@@ -29,6 +29,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -329,7 +330,7 @@ public class ProcessRealAndroidJar {
                 Path source = fileSystem.getPath(toCopy);
                 File dst = new File(destDir, toCopy);
                 dst.getParentFile().mkdirs();
-                Files.copy(source, dst.toPath());
+                Files.copy(source, dst.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
         }
     }
