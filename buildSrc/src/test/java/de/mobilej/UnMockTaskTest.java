@@ -61,6 +61,7 @@ public class UnMockTaskTest {
         + "configurations { testImplementation }"
         + "\n"
         + "android {\n"
+        + "namespace 'com.example.myapp'\n"
         + "compileSdkVersion 28\n"
         + "buildToolsVersion \"28.0.3\"\n"
         + "    defaultConfig {\n"

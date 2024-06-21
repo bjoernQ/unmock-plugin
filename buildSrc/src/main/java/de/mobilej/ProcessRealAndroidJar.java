@@ -324,7 +324,7 @@ public class ProcessRealAndroidJar {
     }
 
     private static void copyFromJarToDirectory(String file, List<String> files, File destDir) throws IOException {
-        try (FileSystem fileSystem = FileSystems.newFileSystem(Paths.get(file), null)) {
+        try (FileSystem fileSystem = FileSystems.newFileSystem(Paths.get(file), (ClassLoader) null)) {
             for (String toCopy : files) {
                 Path source = fileSystem.getPath(toCopy);
                 File dst = new File(destDir, toCopy);
