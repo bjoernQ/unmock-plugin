@@ -16,8 +16,6 @@
 
 package de.mobilej;
 
-import org.gradle.api.logging.Logger;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -48,6 +46,8 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Here the heavy lifting happens.
@@ -62,8 +62,10 @@ import javassist.expr.MethodCall;
 public class ProcessRealAndroidJar {
 
 
+    private static final Logger log = LoggerFactory.getLogger(ProcessRealAndroidJar.class);
+
     public static void process(File allAndroidFile,
-                               File outputDir,
+                               File tmpDir,
                                File unmockedOutputJar,
                                String[] keepClasses,
                                String[] renameClasses,
@@ -78,8 +80,8 @@ public class ProcessRealAndroidJar {
         }
         keepClasses = keepClassesList.toArray(new String[0]);
 
-        delete(outputDir);
-        outputDir.mkdirs();
+        delete(tmpDir);
+        tmpDir.mkdirs();
 
         ArrayList<String> clazzNames = findAllClazzesIn(
                 allAndroidFile.getAbsolutePath());
@@ -89,7 +91,7 @@ public class ProcessRealAndroidJar {
 
         pool.insertClassPath(allAndroidFile.getAbsolutePath());
 
-        createHelperClasses(outputDir, pool);
+        createHelperClasses(tmpDir, pool);
 
         List<CtClass> clazzes = new ArrayList<>();
 
@@ -149,7 +151,7 @@ public class ProcessRealAndroidJar {
         // doesn't allow modifying a nested class when the outer class has been written already
         // (it freezes the outer class again).
         for (CtClass clazz : clazzes) {
-            clazz.writeFile(outputDir.getAbsolutePath());
+            clazz.writeFile(tmpDir.getAbsolutePath());
         }
 
         // copy over non-classes matching "keepStartsWith" paths
@@ -164,9 +166,9 @@ public class ProcessRealAndroidJar {
                 }
             }
         }
-        copyFromJarToDirectory(allAndroidFile.getAbsolutePath(), toCopy, outputDir.getAbsoluteFile());
+        copyFromJarToDirectory(allAndroidFile.getAbsolutePath(), toCopy, tmpDir.getAbsoluteFile());
 
-        createJarArchive(unmockedOutputJar.getAbsolutePath(), outputDir.getAbsolutePath());
+        createJarArchive(unmockedOutputJar.getAbsolutePath(), tmpDir.getAbsolutePath());
 
     }
 

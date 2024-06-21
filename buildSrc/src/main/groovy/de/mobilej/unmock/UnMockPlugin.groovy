@@ -17,44 +17,51 @@
 package de.mobilej.unmock
 
 import com.android.build.gradle.api.BaseVariant
-import de.mobilej.UnMockTask
+import de.mobilej.UnMockTransform
 import org.gradle.api.DomainObjectSet
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.attributes.Attribute
 
 class UnMockPlugin implements Plugin<Project> {
-
     void apply(Project project) {
-        project.configurations.create("unmock")
+        def unmockProcessedAttribute = Attribute.of("unmockProcessed", Boolean.class)
 
+        def unmockConfiguration = project.configurations.create("unmock")
         def unMockExt = project.extensions.create("unMock", UnMockExtension)
 
+        project.dependencies {
+            attributesSchema {
+                attribute(unmockProcessedAttribute)
+            }
+
+            artifactTypes.getByName("jar") {
+                attributes.attribute(unmockProcessedAttribute, false)
+            }
+
+            registerTransform(UnMockTransform) {
+                from.attribute(unmockProcessedAttribute, false)
+                to.attribute(unmockProcessedAttribute, true)
+
+                parameters {
+                    tmpDir = project.file("${project.buildDir}/intermediates/unmock_work")
+                    keepClasses = unMockExt.keep
+                    renameClasses = unMockExt.rename
+                    delegateClasses = unMockExt.delegateClasses
+                }
+            }
+        }
+
+        project.afterEvaluate {
+            unmockConfiguration.attributes.attribute(unmockProcessedAttribute, true)
+        }
+
+
         //create a unique configuration with a default dependency to android jar
-        project.configurations["unmock"].defaultDependencies { dependencies ->
+        unmockConfiguration.defaultDependencies { dependencies ->
             // If the user doesn't add any dependencies to the unmock configuration, this will be used
             dependencies.add(project.dependencies.create("org.robolectric:android-all:4.3_r2-robolectric-0"))
         }
-
-        def outputJarPath = "${project.buildDir}/intermediates/unmocked-android${project.name}.jar"
-
-        //create a unique task to unmock for all variants, the task uses the unique configuration
-        def unMockTask = project.tasks.register("unMock", UnMockTask.class) {
-            if (project.unMock.allAndroid != null) {
-                throw new GradleException("Using 'downloadFrom' is unsupported now. Please use the unmock scope to define the android-all.jar. See https://github.com/bjoernQ/unmock-plugin/blob/master/README.md")
-            }
-
-            allAndroid = project.configurations["unmock"]
-            outputDir = project.file("${project.buildDir}/intermediates/unmock_work")
-            unmockedOutputJar = project.file(outputJarPath)
-            keepClasses = unMockExt.keep
-            renameClasses = unMockExt.rename
-            delegateClasses = unMockExt.delegateClasses
-        }
-
-        //this dependency is provided by the unique task: when gradle will need it, it will run the task,
-        // prior to compilation
-        def outputJarDependency = project.files(outputJarPath).builtBy(unMockTask)
 
         def isLib = project.plugins.findPlugin('com.android.library')
         def isApp = project.plugins.findPlugin('com.android.application')
@@ -62,8 +69,8 @@ class UnMockPlugin implements Plugin<Project> {
         // Use custom variants if specified, otherwise fallback to just unit tests for apps and libs
         project.afterEvaluate {
             def mainVariants = unMockExt.variants ?: (isLib || isApp ? project.android.unitTestVariants : null)
-            mainVariants?.all { variant ->
-                variant.registerPreJavacGeneratedBytecode(outputJarDependency)
+            mainVariants?.configureEach { variant ->
+                variant.registerPreJavacGeneratedBytecode(unmockConfiguration)
             }
         }
     }
