@@ -21,6 +21,7 @@ apply plugin: 'de.mobilej.unmock'
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
+    namespace "de.mobilej.examplelib"
 
     defaultConfig {
         minSdkVersion 24
