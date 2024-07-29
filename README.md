@@ -17,7 +17,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'com.github.bjoernq:unmockplugin:0.7.9'
+        classpath "com.github.bjoernq:unmockplugin:${unmockpluginVersion}"
     }
 }
 ```
