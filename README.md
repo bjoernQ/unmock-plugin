@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.bjoernq/unmockplugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.bjoernq/unmockplugin)
+
 # Android Unmock Gradle Plugin
 
 ## Purpose
