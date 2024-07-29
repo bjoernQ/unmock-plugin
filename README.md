@@ -124,7 +124,7 @@ If you don't configure the unmock dependency the plugin will use `org.robolectri
 ## License
 
 ```
-Copyright 2015,2016,2017,2018,2019,2020,2021 Björn Quentin
+Copyright 2015-2024 Björn Quentin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
