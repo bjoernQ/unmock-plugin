@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.bjoernq/unmockplugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.bjoernq/unmockplugin) [![Apache License](http://img.shields.io/badge/license-Apache%20License%202.0-lightgrey.svg)](http://choosealicense.com/licenses/apache-2.0/)
+
 # Android Unmock Gradle Plugin
 
 ## Purpose
@@ -17,7 +19,7 @@ buildscript {
     }
     
     dependencies {
-        classpath 'com.github.bjoernq:unmockplugin:0.7.9'
+        classpath "com.github.bjoernq:unmockplugin:${unmockpluginVersion}"
     }
 }
 ```
