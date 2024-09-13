@@ -35,8 +35,10 @@ class UnMockPlugin implements Plugin<Project> {
                 attribute(unmockProcessedAttribute)
             }
 
-            artifactTypes.getByName("jar") {
-                attributes.attribute(unmockProcessedAttribute, false)
+            if (artifactTypes.getNames().contains("jar")) {
+                artifactTypes.getByName("jar") {
+                    attributes.attribute(unmockProcessedAttribute, false)
+                }
             }
 
             registerTransform(UnMockTransform) {
