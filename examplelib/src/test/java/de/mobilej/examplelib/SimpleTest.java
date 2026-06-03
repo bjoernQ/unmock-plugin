@@ -41,6 +41,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.FieldPosition;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -150,13 +151,18 @@ public class SimpleTest {
 
     @Test
     public void testIssue42() {
-        DateInterval dtInterval = new DateInterval(1000 * 3600 * 24L, 1000 * 3600 * 24 * 2L);
-        DateIntervalFormat dtIntervalFmt = DateIntervalFormat.getInstance(DateFormat.YEAR_MONTH_DAY, new Locale("en", "GB", ""));
-        StringBuffer str = new StringBuffer("");
-        FieldPosition pos = new FieldPosition(0);
-        // formatting
-        dtIntervalFmt.format(dtInterval, str, pos);
+        TimeZone defaultTz = TimeZone.getDefault();
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("GMT-5"));
+            DateInterval dtInterval = new DateInterval(1000 * 3600 * 24L, 1000 * 3600 * 24 * 2L);
+            DateIntervalFormat dtIntervalFmt = DateIntervalFormat.getInstance(DateFormat.YEAR_MONTH_DAY, new Locale("en", "GB", ""));
+            StringBuffer str = new StringBuffer("");
+            FieldPosition pos = new FieldPosition(0);
+            dtIntervalFmt.format(dtInterval, str, pos);
 
-        assertEquals("1 – 2 January 1970", str.toString());
+            assertEquals("1 – 2 January 1970", str.toString());
+        } finally {
+            TimeZone.setDefault(defaultTz);
+        }
     }
 }

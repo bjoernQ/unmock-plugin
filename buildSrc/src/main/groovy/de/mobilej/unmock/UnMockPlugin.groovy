@@ -16,12 +16,11 @@
 
 package de.mobilej.unmock
 
-import com.android.build.gradle.api.BaseVariant
 import de.mobilej.UnMockTransform
-import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
+import org.gradle.api.tasks.testing.Test
 
 class UnMockPlugin implements Plugin<Project> {
     void apply(Project project) {
@@ -65,14 +64,19 @@ class UnMockPlugin implements Plugin<Project> {
             dependencies.add(project.dependencies.create("org.robolectric:android-all:4.3_r2-robolectric-0"))
         }
 
-        def isLib = project.plugins.findPlugin('com.android.library')
-        def isApp = project.plugins.findPlugin('com.android.application')
+        def unmockFiles = project.files(unmockConfiguration)
 
-        // Use custom variants if specified, otherwise fallback to just unit tests for apps and libs
         project.afterEvaluate {
-            def mainVariants = unMockExt.variants ?: (isLib || isApp ? project.android.unitTestVariants : null)
-            mainVariants?.configureEach { variant ->
-                variant.registerPreJavacGeneratedBytecode(unmockConfiguration)
+            project.tasks.configureEach { task ->
+                if (task.name.contains("UnitTest") && task.hasProperty("classpath")) {
+                    task.classpath = unmockFiles + task.classpath
+                }
+            }
+        }
+
+        project.tasks.withType(Test).configureEach { testTask ->
+            testTask.doFirst {
+                testTask.classpath = unmockFiles + testTask.classpath
             }
         }
     }
@@ -91,8 +95,6 @@ class UnMockExtension {
     List<String> delegateClasses = new ArrayList<>()
 
     boolean usingDefaults = false
-
-    DomainObjectSet<BaseVariant> variants
 
     public UnMockExtension() {
         keep "android.widget.BaseAdapter"
@@ -142,10 +144,6 @@ class UnMockExtension {
     void keepStartingWith(final String clazz) {
         clearDefaultIfNecessary()
         keep.add(clazz)
-    }
-
-    void includeInVariants(final DomainObjectSet<BaseVariant> customVariants) {
-        this.variants = customVariants
     }
 
     KeepMapping keepAndRename(final String clazzToKeep) {
