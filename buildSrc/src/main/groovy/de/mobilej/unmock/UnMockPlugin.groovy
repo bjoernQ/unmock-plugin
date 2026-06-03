@@ -73,12 +73,6 @@ class UnMockPlugin implements Plugin<Project> {
                 }
             }
         }
-
-        project.tasks.withType(Test).configureEach { testTask ->
-            testTask.doFirst {
-                testTask.classpath = unmockFiles + testTask.classpath
-            }
-        }
     }
 }
 
