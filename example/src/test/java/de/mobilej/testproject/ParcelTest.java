@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -28,6 +29,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  * Created by bjoern on 25.12.2016.
  */
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"jdk.internal.reflect.*"})
 @PrepareForTest(ABridge.class)
 public class ParcelTest {
     private Parcel parcel;

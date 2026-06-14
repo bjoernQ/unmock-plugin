@@ -23,14 +23,14 @@ def pluginVersion = '0.9.0'
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -103,7 +103,7 @@ dependencies {
     implementation localGroovy()
 
     implementation 'org.javassist:javassist:3.27.0-GA'
-    implementation 'com.android.tools.build:gradle:8.5.0'
+    implementation 'com.android.tools.build:gradle:9.2.1'
 
     testImplementation 'junit:junit:4.13'
     testImplementation gradleTestKit()
