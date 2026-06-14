@@ -123,6 +123,7 @@ If you don't configure the unmock dependency the plugin will use `org.robolectri
 |0.7.9|Fix #77, contributed by @matejdro
 |0.8.0|#83, contributed by @matejdro
 |0.9.0|#69
+|0.10.0|Gradle 9.0 compatability, contributed by feliksczart
 
 ## License
 
