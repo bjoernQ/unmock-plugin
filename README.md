@@ -124,6 +124,7 @@ If you don't configure the unmock dependency the plugin will use `org.robolectri
 |0.8.0|#83, contributed by @matejdro
 |0.9.0|#69
 |0.10.0|Gradle 9.0 compatability, contributed by feliksczart
+|0.10.1|Same as 0.10.0 but compiled with Java 17
 
 ## License
 
