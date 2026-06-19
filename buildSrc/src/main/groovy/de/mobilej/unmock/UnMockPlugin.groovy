@@ -21,8 +21,6 @@ import de.mobilej.UnMockTransform
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
-import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.tasks.testing.Test
 
 class UnMockPlugin implements Plugin<Project> {
     void apply(Project project) {
