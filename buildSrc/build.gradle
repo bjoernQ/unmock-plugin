@@ -98,7 +98,7 @@ dependencies {
     implementation localGroovy()
 
     implementation 'org.javassist:javassist:3.27.0-GA'
-    implementation 'com.android.tools.build:gradle:9.2.1'
+    implementation 'com.android.tools.build:gradle:9.0.1'
 
     testImplementation 'junit:junit:4.13'
     testImplementation gradleTestKit()
