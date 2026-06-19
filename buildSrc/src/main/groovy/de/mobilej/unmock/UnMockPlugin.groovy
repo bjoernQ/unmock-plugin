@@ -16,6 +16,7 @@
 
 package de.mobilej.unmock
 
+import com.android.build.gradle.tasks.factory.AndroidUnitTest
 import de.mobilej.UnMockTransform
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -68,17 +69,8 @@ class UnMockPlugin implements Plugin<Project> {
         def unmockFiles = project.files(unmockConfiguration)
 
         project.afterEvaluate {
-            project.tasks.configureEach { task ->
-                if (task.name.contains("UnitTest") && task.hasProperty("classpath")) {
-                    // Some test tasks (such as when using Detekt), expose classpath as
-                    // ConfigurableFileCollection. This one does not support adding new files
-                    // with "plus". You have to use "from" method.
-                    if (task.classpath instanceof ConfigurableFileCollection) {
-                        task.classpath.from(unmockFiles)
-                    } else {
-                        task.classpath = unmockFiles + task.classpath
-                    }
-                }
+            project.tasks.withType(AndroidUnitTest.class).configureEach { task ->
+                task.classpath = unmockFiles + task.classpath
             }
         }
     }
