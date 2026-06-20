@@ -16,11 +16,11 @@
 
 package de.mobilej.unmock
 
+import com.android.build.gradle.tasks.factory.AndroidUnitTest
 import de.mobilej.UnMockTransform
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
-import org.gradle.api.tasks.testing.Test
 
 class UnMockPlugin implements Plugin<Project> {
     void apply(Project project) {
@@ -67,10 +67,8 @@ class UnMockPlugin implements Plugin<Project> {
         def unmockFiles = project.files(unmockConfiguration)
 
         project.afterEvaluate {
-            project.tasks.configureEach { task ->
-                if (task.name.contains("UnitTest") && task.hasProperty("classpath")) {
-                    task.classpath = unmockFiles + task.classpath
-                }
+            project.tasks.withType(AndroidUnitTest.class).configureEach { task ->
+                task.classpath = unmockFiles + task.classpath
             }
         }
     }
